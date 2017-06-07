@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Clex.iml" filepath="$PROJECT_DIR$/Clex.iml" />
+      <module fileurl="file://$PROJECT_DIR$/CustomizeLayoutExample/CustomizeLayoutExample.iml" filepath="$PROJECT_DIR$/CustomizeLayoutExample/CustomizeLayoutExample.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>
