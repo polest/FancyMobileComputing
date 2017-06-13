@@ -130,7 +130,7 @@ public class MainActivity extends Activity {
 
             // Get paths for all selected images
             for (String path : all_path){
-                Toast.makeText(this, path, Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this, path, Toast.LENGTH_SHORT).show();
             }
 
 			ArrayList<CustomGallery> dataT = new ArrayList<CustomGallery>();
