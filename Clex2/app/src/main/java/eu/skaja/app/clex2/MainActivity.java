@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
+import android.media.Image;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -68,19 +70,33 @@ public class MainActivity extends Activity {
 		gridGallery.setFastScrollEnabled(true);
 		adapter = new GalleryAdapter(getApplicationContext(), imageLoader);
 		adapter.setMultiplePick(false);
-		gridGallery.setAdapter(adapter);
+
+
+
+
+
 
         AdapterView.OnItemClickListener mItemMulClickListener = new AdapterView.OnItemClickListener() {
 
             @Override
             public void onItemClick(AdapterView<?> l, View v, int position, long id) {
 
+                Drawable highlight = getResources().getDrawable( R.drawable.border );
+
                 Toast.makeText(MainActivity.this, adapter.getItem(position).sdcardPath, Toast.LENGTH_SHORT).show();
+                //adapter.getItem(position).
+
+                v.setBackground(highlight);
 
             }
         };
 
+
+
+
         gridGallery.setOnItemClickListener(mItemMulClickListener);
+
+        gridGallery.setAdapter(adapter);
 
 		viewSwitcher = (ViewSwitcher) findViewById(R.id.viewSwitcher);
 		viewSwitcher.setDisplayedChild(1);
@@ -120,6 +136,9 @@ public class MainActivity extends Activity {
 	}
 
 
+
+
+
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
@@ -128,7 +147,8 @@ public class MainActivity extends Activity {
 
 
 		if (requestCode == 100 && resultCode == Activity.RESULT_OK) {
-			adapter.clear();
+			// ### delte / löschen ###
+            adapter.clear();
 
 			viewSwitcher.setDisplayedChild(1);
 			String single_path = data.getStringExtra("single_path");
