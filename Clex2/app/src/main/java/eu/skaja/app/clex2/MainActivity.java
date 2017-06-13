@@ -10,6 +10,7 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -68,6 +69,18 @@ public class MainActivity extends Activity {
 		adapter.setMultiplePick(false);
 		gridGallery.setAdapter(adapter);
 
+        AdapterView.OnItemClickListener mItemMulClickListener = new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> l, View v, int position, long id) {
+
+                Toast.makeText(MainActivity.this, adapter.getItem(position).sdcardPath, Toast.LENGTH_SHORT).show();
+
+            }
+        };
+
+        gridGallery.setOnItemClickListener(mItemMulClickListener);
+
 		viewSwitcher = (ViewSwitcher) findViewById(R.id.viewSwitcher);
 		viewSwitcher.setDisplayedChild(1);
 
@@ -97,9 +110,13 @@ public class MainActivity extends Activity {
 
 	}
 
+
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
+
+        Log.d("Clex", "testing");
+
 
 		if (requestCode == 100 && resultCode == Activity.RESULT_OK) {
 			adapter.clear();
@@ -111,13 +128,15 @@ public class MainActivity extends Activity {
 		} else if (requestCode == 200 && resultCode == Activity.RESULT_OK) {
 			String[] all_path = data.getStringArrayExtra("all_path");
 
-			ArrayList<CustomGallery> dataT = new ArrayList<CustomGallery>();
+            // Get paths for all selected images
+            for (String path : all_path){
+                //Toast.makeText(this, path, Toast.LENGTH_SHORT).show();
+            }
 
+			ArrayList<CustomGallery> dataT = new ArrayList<CustomGallery>();
 			for (String string : all_path) {
 				CustomGallery item = new CustomGallery();
 				item.sdcardPath = string;
-                //Toast.makeText(this, string, Toast.LENGTH_SHORT).show();
-				Log.d("Clex-Debug", all_path[0]);
 				dataT.add(item);
 			}
 
