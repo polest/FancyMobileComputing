@@ -7,11 +7,13 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
 import com.nostra13.universalimageloader.cache.memory.impl.WeakMemoryCache;
@@ -114,7 +116,8 @@ public class MainActivity extends Activity {
 			for (String string : all_path) {
 				CustomGallery item = new CustomGallery();
 				item.sdcardPath = string;
-
+                //Toast.makeText(this, string, Toast.LENGTH_SHORT).show();
+				Log.d("Clex-Debug", all_path[0]);
 				dataT.add(item);
 			}
 
