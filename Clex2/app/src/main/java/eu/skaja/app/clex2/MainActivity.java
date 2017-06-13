@@ -30,8 +30,9 @@ public class MainActivity extends Activity {
 	GalleryAdapter adapter;
 
 	ImageView imgSinglePick;
-	Button btnGalleryPick;
+	Button btnCreate;
 	Button btnGalleryPickMul;
+	Button btnGalleryPickMusic;
 
 	String action;
 	ViewSwitcher viewSwitcher;
@@ -86,17 +87,25 @@ public class MainActivity extends Activity {
 
 		imgSinglePick = (ImageView) findViewById(R.id.imgSinglePick);
 
-		btnGalleryPick = (Button) findViewById(R.id.btnGalleryPick);
-		btnGalleryPick.setOnClickListener(new View.OnClickListener() {
-
+		btnCreate = (Button) findViewById(R.id.btnCreate);
+		btnCreate.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-
-				Intent i = new Intent(Action.ACTION_PICK);
-				startActivityForResult(i, 100);
-
+				Intent intent = new Intent(MainActivity.this, CreateVideo.class);
+				startActivity(intent);
 			}
 		});
+
+		btnGalleryPickMusic = (Button) findViewById(R.id.btnGalleryPickMusic);
+		btnGalleryPickMusic.setOnClickListener(
+				new View.OnClickListener() {
+					@Override
+					public void onClick(View view) {
+						Intent intent = new Intent(MainActivity.this, MusicPicker.class);
+						startActivity(intent);
+					}
+				}
+		);
 
 		btnGalleryPickMul = (Button) findViewById(R.id.btnGalleryPickMul);
 		btnGalleryPickMul.setOnClickListener(new View.OnClickListener() {
