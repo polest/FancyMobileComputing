@@ -1,12 +1,13 @@
 package eu.skaja.app.clex2;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
-import android.media.Image;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -26,6 +27,14 @@ import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 
 public class MainActivity extends Activity {
+
+    String globalPath;
+
+    public static int CAMERA_PREVIEW_RESULT = 1;
+
+    int PICK_IMAGE_MULTIPLE = 1;
+    String imageEncoded;
+    List<String> imagesEncodedList;
 
 	GridView gridGallery;
 	Handler handler;
@@ -86,7 +95,9 @@ public class MainActivity extends Activity {
                 Toast.makeText(MainActivity.this, adapter.getItem(position).sdcardPath, Toast.LENGTH_SHORT).show();
                 //adapter.getItem(position).
 
-                v.setBackground(highlight);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                    v.setBackground(highlight);
+                }
 
             }
         };
@@ -107,8 +118,11 @@ public class MainActivity extends Activity {
 		btnCreate.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Intent intent = new Intent(MainActivity.this, CreateVideo.class);
+
+				Intent intent = new Intent(MainActivity.this, PhotoEditor.class);
+                intent.putExtra("imagePath", globalPath);
 				startActivity(intent);
+
 			}
 		});
 
@@ -117,8 +131,19 @@ public class MainActivity extends Activity {
 				new View.OnClickListener() {
 					@Override
 					public void onClick(View view) {
+
+
+						Intent intent = new Intent();
+						intent.setType("image/*");
+						intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+						intent.setAction(Intent.ACTION_GET_CONTENT);
+						startActivityForResult(Intent.createChooser(intent,"Select Picture"), PICK_IMAGE_MULTIPLE);
+
+
+						/*
 						Intent intent = new Intent(MainActivity.this, MusicPicker.class);
 						startActivity(intent);
+						*/
 					}
 				}
 		);
@@ -135,7 +160,7 @@ public class MainActivity extends Activity {
 
 	}
 
-
+	
 
 
 
@@ -147,7 +172,7 @@ public class MainActivity extends Activity {
 
 
 		if (requestCode == 100 && resultCode == Activity.RESULT_OK) {
-			// ### delte / löschen ###
+			// ### delete / löschen ###
             adapter.clear();
 
 			viewSwitcher.setDisplayedChild(1);
@@ -155,11 +180,15 @@ public class MainActivity extends Activity {
 			imageLoader.displayImage("file://" + single_path, imgSinglePick);
 
 		} else if (requestCode == 200 && resultCode == Activity.RESULT_OK) {
-			String[] all_path = data.getStringArrayExtra("all_path");
+
+
+
+            String[] all_path = data.getStringArrayExtra("all_path");
 
             // Get paths for all selected images
             for (String path : all_path){
                 //Toast.makeText(this, path, Toast.LENGTH_SHORT).show();
+                globalPath = path;
             }
 
 			ArrayList<CustomGallery> dataT = new ArrayList<CustomGallery>();
@@ -173,4 +202,73 @@ public class MainActivity extends Activity {
 			adapter.addAll(dataT);
 		}
 	}
+
+
+
+    /*
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        try {
+            // When an Image is picked
+            if (requestCode == PICK_IMAGE_MULTIPLE && resultCode == RESULT_OK
+                    && null != data) {
+                // Get the Image from data
+
+                String[] filePathColumn = { MediaStore.Images.Media.DATA };
+                imagesEncodedList = new ArrayList<String>();
+                if(data.getData()!=null){
+
+                    Uri mImageUri=data.getData();
+
+                    // Get the cursor
+                    Cursor cursor = getContentResolver().query(mImageUri,
+                            filePathColumn, null, null, null);
+                    // Move to first row
+                    cursor.moveToFirst();
+
+                    int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+                    imageEncoded  = cursor.getString(columnIndex);
+                    cursor.close();
+
+                }else {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                        if (data.getClipData() != null) {
+                            ClipData mClipData = data.getClipData();
+                            ArrayList<Uri> mArrayUri = new ArrayList<Uri>();
+                            for (int i = 0; i < mClipData.getItemCount(); i++) {
+
+                                ClipData.Item item = mClipData.getItemAt(i);
+                                Uri uri = item.getUri();
+                                mArrayUri.add(uri);
+                                // Get the cursor
+                                Cursor cursor = getContentResolver().query(uri, filePathColumn, null, null, null);
+                                // Move to first row
+                                cursor.moveToFirst();
+
+                                int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+                                imageEncoded  = cursor.getString(columnIndex);
+                                imagesEncodedList.add(imageEncoded);
+                                cursor.close();
+
+                            }
+                            Log.v("LOG_TAG", "Selected Images" + mArrayUri.size());
+                        }
+                    }
+                }
+            } else {
+                Toast.makeText(this, "You haven't picked Image",
+                        Toast.LENGTH_LONG).show();
+            }
+        } catch (Exception e) {
+            Toast.makeText(this, "Something went wrong", Toast.LENGTH_LONG)
+                    .show();
+        }
+
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    */
+
+
 }
