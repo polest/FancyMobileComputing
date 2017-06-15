@@ -132,9 +132,11 @@ public class CustomGalleryActivity extends Activity {
 
 	}
 
+	//WENN BILD REINGELADEN WURDE, DANN VERSCHWINDET DAS MITTELBILD
+	//ES WIRD SO ODER SO NICHT MEHR ANGEZEIGT, WEIL WIR DAFÜR DEN TEXT HABEN!
 	private void checkImageStatus() {
 		if (adapter.isEmpty()) {
-			imgNoMedia.setVisibility(View.VISIBLE);
+			imgNoMedia.setVisibility(View.GONE);
 		} else {
 			imgNoMedia.setVisibility(View.GONE);
 		}
