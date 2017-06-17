@@ -55,6 +55,7 @@ public class MainActivity extends Activity {
 	private Button btnDelete;
 	private Button btnStartEditor;
 	private String musicPath;
+	private CreateVideo video;
 
 	public static int CAMERA_PREVIEW_RESULT = 1;
 
@@ -128,6 +129,7 @@ public class MainActivity extends Activity {
 
 		imgSinglePick = (ImageView) findViewById(R.id.imgSinglePick);
 
+		//checkCreation();
 
 		btnStartEditor.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -162,10 +164,26 @@ public class MainActivity extends Activity {
 				}
 		);
 
+		btnCreate.setOnClickListener(
+				new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						try {
+							// Create video with given image paths and music path
+							Toast.makeText(getApplicationContext(),"Video ist created",Toast.LENGTH_SHORT).show();
+							video = new CreateVideo(imagesEncodedList, musicPath);
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					}
+				}
+		);
 	}
 
 
-    @Override
+
+
+	@Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         try {
             // When an Image is picked
@@ -276,5 +294,14 @@ public class MainActivity extends Activity {
             }
         }
     }
+
+    // Check if video can be created
+	public void checkCreation() {
+		if(this.imagesEncodedList.isEmpty() || this.musicPath.isEmpty()){
+			btnCreate.setClickable(false);
+		}else{
+			btnCreate.setClickable(true);
+		}
+	}
 
 }
