@@ -28,26 +28,22 @@ import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 
 public class MainActivity extends Activity {
 
-    String globalPath;
+    private Button btnCreate;
+    private Button btnGalleryPickMul;
+    private Button btnGalleryPickMusic;
+    private GalleryAdapter adapter;
+    private GridView gridGallery;
+    private Handler handler;
+    private ImageLoader imageLoader;
+    private ImageView imgSinglePick;
+    private int PICK_IMAGE_MULTIPLE = 1;
+    private List<String> imagesEncodedList;
+    private String action;
+    private String globalPath;
+    private String imageEncoded;
+    private ViewSwitcher viewSwitcher;
 
     public static int CAMERA_PREVIEW_RESULT = 1;
-
-    int PICK_IMAGE_MULTIPLE = 1;
-    String imageEncoded;
-    List<String> imagesEncodedList;
-
-	GridView gridGallery;
-	Handler handler;
-	GalleryAdapter adapter;
-
-	ImageView imgSinglePick;
-	Button btnCreate;
-	Button btnGalleryPickMul;
-	Button btnGalleryPickMusic;
-
-	String action;
-	ViewSwitcher viewSwitcher;
-	ImageLoader imageLoader;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -103,10 +99,7 @@ public class MainActivity extends Activity {
         };
 
 
-
-
         gridGallery.setOnItemClickListener(mItemMulClickListener);
-
         gridGallery.setAdapter(adapter);
 
 		viewSwitcher = (ViewSwitcher) findViewById(R.id.viewSwitcher);
@@ -118,11 +111,9 @@ public class MainActivity extends Activity {
 		btnCreate.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-
 				Intent intent = new Intent(MainActivity.this, PhotoEditor.class);
                 intent.putExtra("imagePath", globalPath);
 				startActivity(intent);
-
 			}
 		});
 
@@ -131,14 +122,11 @@ public class MainActivity extends Activity {
 				new View.OnClickListener() {
 					@Override
 					public void onClick(View view) {
-
-
 						Intent intent = new Intent();
 						intent.setType("image/*");
 						intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
 						intent.setAction(Intent.ACTION_GET_CONTENT);
 						startActivityForResult(Intent.createChooser(intent,"Select Picture"), PICK_IMAGE_MULTIPLE);
-
 
 						/*
 						Intent intent = new Intent(MainActivity.this, MusicPicker.class);
@@ -150,26 +138,19 @@ public class MainActivity extends Activity {
 
 		btnGalleryPickMul = (Button) findViewById(R.id.btnGalleryPickMul);
 		btnGalleryPickMul.setOnClickListener(new View.OnClickListener() {
-
 			@Override
 			public void onClick(View v) {
 				Intent i = new Intent(Action.ACTION_MULTIPLE_PICK);
 				startActivityForResult(i, 200);
 			}
 		});
-
 	}
-
-	
-
-
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 
         Log.d("Clex", "testing");
-
 
 		if (requestCode == 100 && resultCode == Activity.RESULT_OK) {
 			// ### delete / löschen ###
@@ -180,9 +161,6 @@ public class MainActivity extends Activity {
 			imageLoader.displayImage("file://" + single_path, imgSinglePick);
 
 		} else if (requestCode == 200 && resultCode == Activity.RESULT_OK) {
-
-
-
             String[] all_path = data.getStringArrayExtra("all_path");
 
             // Get paths for all selected images
@@ -202,8 +180,6 @@ public class MainActivity extends Activity {
 			adapter.addAll(dataT);
 		}
 	}
-
-
 
     /*
 
@@ -267,8 +243,5 @@ public class MainActivity extends Activity {
 
         super.onActivityResult(requestCode, resultCode, data);
     }
-
     */
-
-
 }
