@@ -36,28 +36,31 @@ import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 
 public class MainActivity extends Activity {
 
-    private Button btnCreate;
-    private Button btnSelectImages;
-    private Button btnPickMusic;
-    private GalleryAdapter adapter;
-    private GridView gridGallery;
-    private Handler handler;
-    private ImageLoader imageLoader;
-    private ImageView imgSinglePick;
-    private int PICK_IMAGE_MULTIPLE = 1;
-    private List<String> imagesEncodedList;
-    private String action;
-    private String selectedImage;
-    private String imageEncoded;
-    private ViewSwitcher viewSwitcher;
-	private Button btnSortUp;
-	private Button btnSortDown;
+	private boolean imagesPicked = false;
+	private boolean musicPicked = false;
+	private Button btnCreate;
 	private Button btnDelete;
+	private Button btnPickMusic;
+	private Button btnSelectImages;
+	private Button btnSortDown;
+	private Button btnSortUp;
 	private Button btnStartEditor;
+	private GalleryAdapter adapter;
+	private GridView gridGallery;
+	private Handler handler;
+	private ImageLoader imageLoader;
+	private ImageView imgSinglePick;
+	private int PICK_IMAGE_MULTIPLE = 1;
+	private List<String> imagesEncodedList;
+	private String action;
+	private String imageEncoded;
 	private String musicPath;
+	private String selectedImage;
+	private ViewSwitcher viewSwitcher;
 	private CreateVideo video;
 
-	public static int CAMERA_PREVIEW_RESULT = 1;
+	public static final int CAMERA_PREVIEW_RESULT = 1;
+	public static final int MUSIC_PICKER = 2;
 
 
 	@Override
@@ -112,22 +115,19 @@ public class MainActivity extends Activity {
 
         //Leiste oben
 		btnCreate = (Button) findViewById(R.id.btnCreate);
-		btnSortUp = (Button)findViewById(R.id.btnSortUp);
-		btnSortDown = (Button)findViewById(R.id.btnSortDown);
 		btnDelete = (Button)findViewById(R.id.btnDelete);
-		btnStartEditor = (Button)findViewById(R.id.btnStartEditor);
-
-		btnSelectImages = (Button) findViewById(R.id.btnSelectImages);
-		viewSwitcher = (ViewSwitcher) findViewById(R.id.viewSwitcher);
+		btnSortDown = (Button)findViewById(R.id.btnSortDown);
+		btnSortUp = (Button)findViewById(R.id.btnSortUp);
 		btnPickMusic = (Button) findViewById(R.id.btnPickMusic);
+		btnStartEditor = (Button)findViewById(R.id.btnStartEditor);
+		btnSelectImages = (Button) findViewById(R.id.btnSelectImages);
+		imgSinglePick = (ImageView) findViewById(R.id.imgSinglePick);
+		viewSwitcher = (ViewSwitcher) findViewById(R.id.viewSwitcher);
 
 		gridGallery.setOnItemClickListener(mItemMulClickListener);
-        gridGallery.setAdapter(adapter);
+		gridGallery.setAdapter(adapter);
 
 		viewSwitcher.setDisplayedChild(1);
-
-
-		imgSinglePick = (ImageView) findViewById(R.id.imgSinglePick);
 
 		//checkCreation();
 
@@ -146,8 +146,7 @@ public class MainActivity extends Activity {
 					@Override
 					public void onClick(View v) {
 						Intent intent = new Intent(MainActivity.this, MusicPicker.class);
-						intent.putExtra("selectedImagePath", selectedImage);
-						startActivity(intent);
+						startActivityForResult(intent, MUSIC_PICKER);
 					}
 				}
 		);
@@ -180,67 +179,72 @@ public class MainActivity extends Activity {
 		);
 	}
 
-
-
-
 	@Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        try {
-            // When an Image is picked
-            if (requestCode == PICK_IMAGE_MULTIPLE && resultCode == RESULT_OK
+		super.onActivityResult(requestCode, resultCode, data);
+		try {
+			// When an Image is picked
+			if (requestCode == PICK_IMAGE_MULTIPLE && resultCode == RESULT_OK
                     && null != data) {
 
 
-                imagesEncodedList = new ArrayList<String>();
-                if(data.getData()!=null){
+				imagesEncodedList = new ArrayList<String>();
+				if(data.getData()!=null){
 
-                    Uri mImageUri=data.getData();
+					Uri mImageUri=data.getData();
 
-                    imageEncoded  = getRealPathFromURI_API19(getApplicationContext(), mImageUri);
-                    imagesEncodedList.add(imageEncoded);
+					imageEncoded  = getRealPathFromURI_API19(getApplicationContext(), mImageUri);
+					imagesEncodedList.add(imageEncoded);
 
-                }else {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                        if (data.getClipData() != null) {
-                            ClipData mClipData = data.getClipData();
+				}else {
+					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+						if (data.getClipData() != null) {
+							ClipData mClipData = data.getClipData();
 
-                            for (int i = 0; i < mClipData.getItemCount(); i++) {
+							for (int i = 0; i < mClipData.getItemCount(); i++) {
 
-                                ClipData.Item item = mClipData.getItemAt(i);
-                                Uri uri = item.getUri();
+								ClipData.Item item = mClipData.getItemAt(i);
+								Uri uri = item.getUri();
 
-                                imageEncoded  = getRealPathFromURI_API19(getApplicationContext(), uri);
-                                imagesEncodedList.add(imageEncoded);
+								imageEncoded  = getRealPathFromURI_API19(getApplicationContext(), uri);
+								imagesEncodedList.add(imageEncoded);
 
-                            }
+							}
 						}
-                    }
-                }
+					}
+				}
 
-                ArrayList<CustomGallery> dataT = new ArrayList<CustomGallery>();
-                for (String string : imagesEncodedList) {
-                    CustomGallery item = new CustomGallery();
-                    item.sdcardPath = string;
-                    dataT.add(item);
-                }
+				ArrayList<CustomGallery> dataT = new ArrayList<CustomGallery>();
+				for (String string : imagesEncodedList) {
+					CustomGallery item = new CustomGallery();
+					item.sdcardPath = string;
+					dataT.add(item);
+				}
 
-                viewSwitcher.setDisplayedChild(0);
-                adapter.addAll(dataT);
+				viewSwitcher.setDisplayedChild(0);
+				adapter.addAll(dataT);
+				this.imagesPicked = true;
 
 
 
-            } else {
-                Toast.makeText(this, "You haven't picked Image",
+			} else {
+				Toast.makeText(this, "You haven't picked Image",
                         Toast.LENGTH_LONG).show();
-            }
-        } catch (Exception e) {
-            Toast.makeText(this, "Something went wrong", Toast.LENGTH_LONG)
+			}
+		} catch (Exception e) {
+			Toast.makeText(this, "Something went wrong", Toast.LENGTH_LONG)
                     .show();
-        }
+		}
 
-        super.onActivityResult(requestCode, resultCode, data);
+		// Get the selected music for the video
+		if(requestCode == MUSIC_PICKER && resultCode == RESULT_OK){
+			// Get the music path from the intent
+			this.musicPath = data.getStringExtra("selectedMusicPath");
+			// Set boolean for picked music on true to give the hint
+			// that the music for the video is selected
+			this.musicPicked = true;
+		}
     }
-
 
 	public static String getRealPathFromURI_API19(Context context, Uri uri) {
 		String filePath = "";
@@ -276,7 +280,6 @@ public class MainActivity extends Activity {
 		}
 
 	}
-
 
     public static String getRealPathFromURI(Context context, Uri contentUri) {
         Cursor cursor = null;
