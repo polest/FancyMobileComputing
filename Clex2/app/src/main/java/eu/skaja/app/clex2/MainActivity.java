@@ -42,8 +42,12 @@ public class MainActivity extends Activity {
     private String globalPath;
     private String imageEncoded;
     private ViewSwitcher viewSwitcher;
+	private Button btnSortUp;
+	private Button btnSortDown;
+	private Button btnDelete;
+	private Button btnStartEditor;
 
-    public static int CAMERA_PREVIEW_RESULT = 1;
+	public static int CAMERA_PREVIEW_RESULT = 1;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -98,8 +102,14 @@ public class MainActivity extends Activity {
             }
         };
 
+        //Leiste oben
+		btnSortUp = (Button)findViewById(R.id.btnSortUp);
+		btnSortDown = (Button)findViewById(R.id.btnSortDown);
+		btnDelete = (Button)findViewById(R.id.btnDelete);
+		btnStartEditor = (Button)findViewById(R.id.btnStartEditor);
 
-        gridGallery.setOnItemClickListener(mItemMulClickListener);
+
+		gridGallery.setOnItemClickListener(mItemMulClickListener);
         gridGallery.setAdapter(adapter);
 
 		viewSwitcher = (ViewSwitcher) findViewById(R.id.viewSwitcher);

@@ -11,6 +11,37 @@
         android:layout_height="wrap_content"
         layout="@layout/titlebar" />
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btnSortUp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="UP" />
+
+        <Button
+            android:id="@+id/btnSortDown"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="DOWN" />
+
+        <Button
+            android:id="@+id/btnStartEditor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Editor" />
+
+        <Button
+            android:id="@+id/btnDelete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="X" />
+    </LinearLayout>
+
     <TextView
         android:id="@+id/textView"
         android:layout_width="fill_parent"
@@ -43,8 +74,7 @@
             android:numColumns="3"
             android:padding="0dp"
             android:verticalSpacing="-15dp"
-            tools:listitem="@layout/gallery_item" >
-        </GridView>
+            tools:listitem="@layout/gallery_item"></GridView>
 
         <ImageView
             android:id="@+id/imgSinglePick"
@@ -99,6 +129,7 @@
                 android:layout_weight="1"
                 android:gravity="center_horizontal|center"
                 android:text="@string/btn_pick" />
+
         </LinearLayout>
 
     </LinearLayout>
