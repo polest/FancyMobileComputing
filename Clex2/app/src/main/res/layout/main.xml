@@ -4,16 +4,17 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:background="@color/bg_light_blue"
-    android:orientation="vertical" >
+    android:orientation="vertical">
 
     <include
+        layout="@layout/titlebar"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        layout="@layout/titlebar" />
+        android:layout_height="wrap_content" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="#1c1c1c"
         android:gravity="center_horizontal"
         android:orientation="horizontal">
 
@@ -21,25 +22,28 @@
             android:id="@+id/btnSortUp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="UP" />
+            android:background="@drawable/left_arrow" />
 
         <Button
             android:id="@+id/btnSortDown"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="DOWN" />
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:background="@drawable/right_arrow" />
 
         <Button
             android:id="@+id/btnStartEditor"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Editor" />
+            android:background="@drawable/edit_image" />
 
         <Button
             android:id="@+id/btnDelete"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="X" />
+            android:layout_marginLeft="20dp"
+            android:background="@drawable/bin" />
     </LinearLayout>
 
     <TextView
@@ -59,7 +63,7 @@
         android:layout_height="0dp"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
-        android:layout_weight="1" >
+        android:layout_weight="1">
 
         <GridView
             android:id="@+id/gridGallery"
@@ -89,6 +93,7 @@
         android:id="@+id/llBottomContainer"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:background="#1c1c1c"
         android:gravity="center_vertical|center"
         android:orientation="vertical"
         android:padding="5dp"
@@ -97,37 +102,31 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:gravity="center_horizontal"
             android:orientation="horizontal">
 
             <Button
                 android:id="@+id/btnSelectImages"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Choose Images" />
+                android:background="@drawable/select_images"
+                android:elevation="0dp" />
 
             <Button
                 android:id="@+id/btnPickMusic"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center_horizontal|center"
-                android:text="Pick Music" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="35.17"
-            android:orientation="horizontal">
+                android:layout_marginLeft="40dp"
+                android:layout_marginRight="40dp"
+                android:background="@drawable/select_music"
+                android:gravity="center_horizontal|center" />
 
             <Button
                 android:id="@+id/btnCreate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center_horizontal|center"
-                android:text="@string/btn_pick" />
+                android:background="@drawable/create_video"
+                android:gravity="center_horizontal|center" />
 
         </LinearLayout>
 
