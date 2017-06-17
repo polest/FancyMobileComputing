@@ -2,6 +2,7 @@
 package eu.skaja.app.clex2;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.util.Log;
@@ -25,11 +26,29 @@ public class MusicPicker extends Activity {
 
     private ListView musicList;
     private MediaPlayer mPlayer = null;
+    private Button btnConfirmMusic;
+    String musicPath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_music_picker);
+
+        btnConfirmMusic = (Button)findViewById(R.id.btnConfirmMusic);
+        btnConfirmMusic.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Toast.makeText(MusicPicker.this, musicPath, Toast.LENGTH_SHORT).show();
+                        mPlayer.reset();
+                        Intent intent = new Intent(MusicPicker.this, MainActivity.class);
+                        intent.putExtra("selectedMusicPath", musicPath);
+                        setResult(Activity.RESULT_OK, intent);
+                        finish();
+
+                    }
+                }
+        );
 
         musicList = (ListView)findViewById(R.id.musicList);
 
@@ -37,7 +56,28 @@ public class MusicPicker extends Activity {
                 "Inspirational",
                 "Hearthbeat",
                 "Sadly",
+                "TheBuildup",
+                "Inspirational",
+                "Hearthbeat",
+                "Sadly",
+                "TheBuildup",
+                "Inspirational",
+                "Hearthbeat",
+                "Sadly",
+                "TheBuildup",
+                "Inspirational",
+                "Hearthbeat",
+                "Sadly",
+                "TheBuildup",
+                "Inspirational",
+                "Hearthbeat",
+                "Sadly",
+                "TheBuildup",
+                "Inspirational",
+                "Hearthbeat",
+                "Sadly",
                 "TheBuildup"
+
         };
         final Integer[] mp3s = new Integer[] {
                 R.raw.inspirational,
@@ -63,7 +103,7 @@ public class MusicPicker extends Activity {
                 int itemPosition     = position;
 
                 // ListView Clicked item value
-                String  itemValue    = (String) musicList.getItemAtPosition(position);
+                musicPath    = (String) musicList.getItemAtPosition(position);
 
                 mPlayer = MediaPlayer.create(MusicPicker.this, mp3s[position]);
                 mPlayer.start();
