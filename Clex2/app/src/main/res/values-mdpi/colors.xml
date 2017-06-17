@@ -6,7 +6,7 @@
     <color name="light_gray">#AA808080</color>
     <color name="gray">#dddddd</color>
     <color name="tab_bg">#142029</color>
-    <color name="bg_light_blue">#ffffff</color>
+    <color name="bg_light_blue">#000000</color>
     <color name="light_black">#CC000000</color>
     <color name="light_black_AA">#AA000000</color>
     <color name="light_black_">#33000000</color>

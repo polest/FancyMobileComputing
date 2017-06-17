@@ -54,6 +54,7 @@ public class MainActivity extends Activity {
 	private Button btnSortDown;
 	private Button btnDelete;
 	private Button btnStartEditor;
+	private String musicPath;
 
 	public static int CAMERA_PREVIEW_RESULT = 1;
 
@@ -137,6 +138,7 @@ public class MainActivity extends Activity {
 			}
 		});
 
+		this.musicPath = "";
 		btnPickMusic.setOnClickListener(
 				new View.OnClickListener() {
 					@Override
