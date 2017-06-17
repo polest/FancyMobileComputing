@@ -33,7 +33,6 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".CreateVideo" />
         <activity android:name=".MusicPicker" />
         <activity android:name=".PhotoEditor"></activity>
     </application>

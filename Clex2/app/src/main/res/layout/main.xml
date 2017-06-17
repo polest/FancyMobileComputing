@@ -100,15 +100,14 @@
             android:orientation="horizontal">
 
             <Button
-                android:id="@+id/btnGalleryPickMul"
+                android:id="@+id/btnSelectImages"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:gravity="center_horizontal|center"
                 android:text="Choose Images" />
 
             <Button
-                android:id="@+id/btnGalleryPickMusic"
+                android:id="@+id/btnPickMusic"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"

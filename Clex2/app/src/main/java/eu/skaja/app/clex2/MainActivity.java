@@ -29,8 +29,8 @@ import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 public class MainActivity extends Activity {
 
     private Button btnCreate;
-    private Button btnGalleryPickMul;
-    private Button btnGalleryPickMusic;
+    private Button btnSelectImages;
+    private Button btnPickMusic;
     private GalleryAdapter adapter;
     private GridView gridGallery;
     private Handler handler;
@@ -103,32 +103,45 @@ public class MainActivity extends Activity {
         };
 
         //Leiste oben
+		btnCreate = (Button) findViewById(R.id.btnCreate);
 		btnSortUp = (Button)findViewById(R.id.btnSortUp);
 		btnSortDown = (Button)findViewById(R.id.btnSortDown);
 		btnDelete = (Button)findViewById(R.id.btnDelete);
 		btnStartEditor = (Button)findViewById(R.id.btnStartEditor);
 
+		btnSelectImages = (Button) findViewById(R.id.btnSelectImages);
+		viewSwitcher = (ViewSwitcher) findViewById(R.id.viewSwitcher);
+		btnPickMusic = (Button) findViewById(R.id.btnPickMusic);
 
 		gridGallery.setOnItemClickListener(mItemMulClickListener);
         gridGallery.setAdapter(adapter);
 
-		viewSwitcher = (ViewSwitcher) findViewById(R.id.viewSwitcher);
 		viewSwitcher.setDisplayedChild(1);
+
 
 		imgSinglePick = (ImageView) findViewById(R.id.imgSinglePick);
 
-		btnCreate = (Button) findViewById(R.id.btnCreate);
-		btnCreate.setOnClickListener(new View.OnClickListener() {
+
+		btnStartEditor.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				Intent intent = new Intent(MainActivity.this, PhotoEditor.class);
-                intent.putExtra("imagePath", globalPath);
+				intent.putExtra("imagePath", globalPath);
 				startActivity(intent);
 			}
 		});
 
-		btnGalleryPickMusic = (Button) findViewById(R.id.btnGalleryPickMusic);
-		btnGalleryPickMusic.setOnClickListener(
+		btnPickMusic.setOnClickListener(
+				new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						Intent intent = new Intent(MainActivity.this, MusicPicker.class);
+						startActivity(intent);
+					}
+				}
+		);
+
+		btnSelectImages.setOnClickListener(
 				new View.OnClickListener() {
 					@Override
 					public void onClick(View view) {
@@ -146,14 +159,6 @@ public class MainActivity extends Activity {
 				}
 		);
 
-		btnGalleryPickMul = (Button) findViewById(R.id.btnGalleryPickMul);
-		btnGalleryPickMul.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Intent i = new Intent(Action.ACTION_MULTIPLE_PICK);
-				startActivityForResult(i, 200);
-			}
-		});
 	}
 
 	@Override
