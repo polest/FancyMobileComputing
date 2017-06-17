@@ -32,10 +32,10 @@ public class PhotoEditor extends Activity implements PermissionRequest.Response 
 
         Bundle b = new Bundle();
         b = getIntent().getExtras();
-        String imagePath = b.getString("imagePath");
+        String selectedImagePath = b.getString("selectedImagePath");
 
         SettingsList settingsList = new SettingsList();
-        String myPicture = "content://com.android.providers.downloads.documents/document/361"; //imagePath;
+        String myPicture = selectedImagePath;
         settingsList
                 .getSettingsModel(EditorLoadSettings.class)
                 .setImageSourcePath(myPicture, true) // Load with delete protection true!
@@ -81,6 +81,7 @@ public class PhotoEditor extends Activity implements PermissionRequest.Response 
 
             Toast.makeText(this, "Image Save on: " + resultPath, Toast.LENGTH_LONG).show();
         }
+        finish();
     }
 
     // Important permission request for Android 6.0 and above, don't forget this!
