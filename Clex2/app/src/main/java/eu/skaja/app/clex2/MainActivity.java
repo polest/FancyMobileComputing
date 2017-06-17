@@ -2,7 +2,6 @@ package eu.skaja.app.clex2;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -19,7 +18,6 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
-
 import com.nostra13.universalimageloader.cache.memory.impl.WeakMemoryCache;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -36,18 +34,18 @@ public class MainActivity extends Activity {
     private Handler handler;
     private ImageLoader imageLoader;
     private ImageView imgSinglePick;
-    private int PICK_IMAGE_MULTIPLE = 1;
     private List<String> imagesEncodedList;
-    private String action;
-    private String globalPath;
-    private String imageEncoded;
-    private ViewSwitcher viewSwitcher;
+	private String action;
+	private String globalPath;
+	private String imageEncoded;
+	private ViewSwitcher viewSwitcher;
 	private Button btnSortUp;
 	private Button btnSortDown;
 	private Button btnDelete;
 	private Button btnStartEditor;
 
 	public static int CAMERA_PREVIEW_RESULT = 1;
+	public static int PICK_IMAGE_MULTIPLE = 1;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -80,11 +78,6 @@ public class MainActivity extends Activity {
 		adapter = new GalleryAdapter(getApplicationContext(), imageLoader);
 		adapter.setMultiplePick(false);
 
-
-
-
-
-
         AdapterView.OnItemClickListener mItemMulClickListener = new AdapterView.OnItemClickListener() {
 
             @Override
@@ -104,32 +97,25 @@ public class MainActivity extends Activity {
 
         //Leiste oben
 		btnCreate = (Button) findViewById(R.id.btnCreate);
-		btnSortUp = (Button)findViewById(R.id.btnSortUp);
-		btnSortDown = (Button)findViewById(R.id.btnSortDown);
 		btnDelete = (Button)findViewById(R.id.btnDelete);
-		btnStartEditor = (Button)findViewById(R.id.btnStartEditor);
-
-		btnSelectImages = (Button) findViewById(R.id.btnSelectImages);
-		viewSwitcher = (ViewSwitcher) findViewById(R.id.viewSwitcher);
 		btnPickMusic = (Button) findViewById(R.id.btnPickMusic);
+		btnSelectImages = (Button) findViewById(R.id.btnSelectImages);
+		btnSortDown = (Button)findViewById(R.id.btnSortDown);
+		btnSortUp = (Button)findViewById(R.id.btnSortUp);
+		btnStartEditor = (Button)findViewById(R.id.btnStartEditor);
+		viewSwitcher = (ViewSwitcher) findViewById(R.id.viewSwitcher);
 
 		gridGallery.setOnItemClickListener(mItemMulClickListener);
         gridGallery.setAdapter(adapter);
-
+		imgSinglePick = (ImageView) findViewById(R.id.imgSinglePick);
 		viewSwitcher.setDisplayedChild(1);
 
+		if(this.imagesEncodedList.isEmpty()){
+			btnCreate.setClickable(false);
+		}else{
+			btnCreate.setClickable(true);
+		}
 
-		imgSinglePick = (ImageView) findViewById(R.id.imgSinglePick);
-
-
-		btnStartEditor.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Intent intent = new Intent(MainActivity.this, PhotoEditor.class);
-				intent.putExtra("imagePath", globalPath);
-				startActivity(intent);
-			}
-		});
 
 		btnPickMusic.setOnClickListener(
 				new View.OnClickListener() {
@@ -140,6 +126,15 @@ public class MainActivity extends Activity {
 					}
 				}
 		);
+
+		btnStartEditor.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(MainActivity.this, PhotoEditor.class);
+				intent.putExtra("imagePath", globalPath);
+				startActivity(intent);
+			}
+		});
 
 		btnSelectImages.setOnClickListener(
 				new View.OnClickListener() {
@@ -158,6 +153,22 @@ public class MainActivity extends Activity {
 					}
 				}
 		);
+
+
+		/*
+		Comment: Layout für das fertige Video muss entworfen werden.
+		musicPath (public String musicPath) muss in einer Variable zum weitergeben gespeichert werden.
+
+
+		btnCreate.setOnClickListener(
+			new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					Intent intent = new Intent(MainActivity.this, MusicPicker.class);
+					startActivity(intent);
+				}
+			}
+		});*/
 
 	}
 
