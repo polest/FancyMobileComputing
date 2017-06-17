@@ -47,7 +47,7 @@ public class MainActivity extends Activity {
     private int PICK_IMAGE_MULTIPLE = 1;
     private List<String> imagesEncodedList;
     private String action;
-    private String globalPath;
+    private String selectedImage;
     private String imageEncoded;
     private ViewSwitcher viewSwitcher;
 	private Button btnSortUp;
@@ -89,17 +89,14 @@ public class MainActivity extends Activity {
 		adapter = new GalleryAdapter(getApplicationContext(), imageLoader);
 		adapter.setMultiplePick(false);
 
-
-
-
-
-
         AdapterView.OnItemClickListener mItemMulClickListener = new AdapterView.OnItemClickListener() {
 
             @Override
             public void onItemClick(AdapterView<?> l, View v, int position, long id) {
 
                 Drawable highlight = getResources().getDrawable( R.drawable.border );
+
+                selectedImage = adapter.getItem(position).sdcardPath;
 
                 Toast.makeText(MainActivity.this, adapter.getItem(position).sdcardPath, Toast.LENGTH_SHORT).show();
                 //adapter.getItem(position).
@@ -135,8 +132,8 @@ public class MainActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				Intent intent = new Intent(MainActivity.this, PhotoEditor.class);
-				intent.putExtra("imagePath", globalPath);
-				startActivity(intent);
+				intent.putExtra("selectedImagePath", selectedImage);
+                startActivity(intent);
 			}
 		});
 
@@ -145,6 +142,7 @@ public class MainActivity extends Activity {
 					@Override
 					public void onClick(View v) {
 						Intent intent = new Intent(MainActivity.this, MusicPicker.class);
+						intent.putExtra("selectedImagePath", selectedImage);
 						startActivity(intent);
 					}
 				}
