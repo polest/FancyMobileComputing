@@ -55,12 +55,9 @@ public class MainActivity extends Activity {
 	private String action;
 	private String imageEncoded;
 	private String musicPath;
-<<<<<<< HEAD
 	private String selectedImage;
 	private ViewSwitcher viewSwitcher;
-=======
 	private CreateVideo video;
->>>>>>> refs/remotes/origin/master
 
 	public static final int CAMERA_PREVIEW_RESULT = 1;
 	public static final int MUSIC_PICKER = 2;
@@ -132,14 +129,8 @@ public class MainActivity extends Activity {
 
 		viewSwitcher.setDisplayedChild(1);
 
-<<<<<<< HEAD
-=======
-
-		imgSinglePick = (ImageView) findViewById(R.id.imgSinglePick);
-
 		//checkCreation();
 
->>>>>>> refs/remotes/origin/master
 		btnStartEditor.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -188,14 +179,7 @@ public class MainActivity extends Activity {
 		);
 	}
 
-<<<<<<< HEAD
-    @Override
-=======
-
-
-
 	@Override
->>>>>>> refs/remotes/origin/master
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 		try {
