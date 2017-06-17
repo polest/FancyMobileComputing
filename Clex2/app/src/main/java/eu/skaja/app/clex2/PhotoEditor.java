@@ -35,7 +35,7 @@ public class PhotoEditor extends Activity implements PermissionRequest.Response 
         String imagePath = b.getString("imagePath");
 
         SettingsList settingsList = new SettingsList();
-        String myPicture = imagePath;
+        String myPicture = "content://com.android.providers.downloads.documents/document/361"; //imagePath;
         settingsList
                 .getSettingsModel(EditorLoadSettings.class)
                 .setImageSourcePath(myPicture, true) // Load with delete protection true!

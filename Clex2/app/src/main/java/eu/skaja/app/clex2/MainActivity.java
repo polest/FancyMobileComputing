@@ -1,15 +1,23 @@
 package eu.skaja.app.clex2;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
+import android.content.ClipData;
+import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.DocumentsContract;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -49,6 +57,7 @@ public class MainActivity extends Activity {
 	private String musicPath;
 
 	public static int CAMERA_PREVIEW_RESULT = 1;
+
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -147,58 +156,16 @@ public class MainActivity extends Activity {
 				new View.OnClickListener() {
 					@Override
 					public void onClick(View view) {
-						Intent intent = new Intent();
-						intent.setType("image/*");
-						intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-						intent.setAction(Intent.ACTION_GET_CONTENT);
-						startActivityForResult(Intent.createChooser(intent,"Select Picture"), PICK_IMAGE_MULTIPLE);
-
-						/*
-						Intent intent = new Intent(MainActivity.this, MusicPicker.class);
-						startActivity(intent);
-						*/
+                        Intent i = new Intent(Intent.ACTION_GET_CONTENT,android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                        i.setType("image/*");
+                        i.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                        startActivityForResult(i, PICK_IMAGE_MULTIPLE);
 					}
 				}
 		);
 
 	}
 
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		super.onActivityResult(requestCode, resultCode, data);
-
-        Log.d("Clex", "testing");
-
-		if (requestCode == 100 && resultCode == Activity.RESULT_OK) {
-			// ### delete / löschen ###
-            adapter.clear();
-
-			viewSwitcher.setDisplayedChild(1);
-			String single_path = data.getStringExtra("single_path");
-			imageLoader.displayImage("file://" + single_path, imgSinglePick);
-
-		} else if (requestCode == 200 && resultCode == Activity.RESULT_OK) {
-            String[] all_path = data.getStringArrayExtra("all_path");
-
-            // Get paths for all selected images
-            for (String path : all_path){
-                //Toast.makeText(this, path, Toast.LENGTH_SHORT).show();
-                globalPath = path;
-            }
-
-			ArrayList<CustomGallery> dataT = new ArrayList<CustomGallery>();
-			for (String string : all_path) {
-				CustomGallery item = new CustomGallery();
-				item.sdcardPath = string;
-				dataT.add(item);
-			}
-
-			viewSwitcher.setDisplayedChild(0);
-			adapter.addAll(dataT);
-		}
-	}
-
-    /*
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -206,49 +173,46 @@ public class MainActivity extends Activity {
             // When an Image is picked
             if (requestCode == PICK_IMAGE_MULTIPLE && resultCode == RESULT_OK
                     && null != data) {
-                // Get the Image from data
 
-                String[] filePathColumn = { MediaStore.Images.Media.DATA };
+
                 imagesEncodedList = new ArrayList<String>();
                 if(data.getData()!=null){
 
                     Uri mImageUri=data.getData();
 
-                    // Get the cursor
-                    Cursor cursor = getContentResolver().query(mImageUri,
-                            filePathColumn, null, null, null);
-                    // Move to first row
-                    cursor.moveToFirst();
-
-                    int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-                    imageEncoded  = cursor.getString(columnIndex);
-                    cursor.close();
+                    imageEncoded  = getRealPathFromURI_API19(getApplicationContext(), mImageUri);
+                    imagesEncodedList.add(imageEncoded);
 
                 }else {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                         if (data.getClipData() != null) {
                             ClipData mClipData = data.getClipData();
-                            ArrayList<Uri> mArrayUri = new ArrayList<Uri>();
+
                             for (int i = 0; i < mClipData.getItemCount(); i++) {
 
                                 ClipData.Item item = mClipData.getItemAt(i);
                                 Uri uri = item.getUri();
-                                mArrayUri.add(uri);
-                                // Get the cursor
-                                Cursor cursor = getContentResolver().query(uri, filePathColumn, null, null, null);
-                                // Move to first row
-                                cursor.moveToFirst();
 
-                                int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-                                imageEncoded  = cursor.getString(columnIndex);
+                                imageEncoded  = getRealPathFromURI_API19(getApplicationContext(), uri);
                                 imagesEncodedList.add(imageEncoded);
-                                cursor.close();
 
                             }
-                            Log.v("LOG_TAG", "Selected Images" + mArrayUri.size());
-                        }
+						}
                     }
                 }
+
+                ArrayList<CustomGallery> dataT = new ArrayList<CustomGallery>();
+                for (String string : imagesEncodedList) {
+                    CustomGallery item = new CustomGallery();
+                    item.sdcardPath = string;
+                    dataT.add(item);
+                }
+
+                viewSwitcher.setDisplayedChild(0);
+                adapter.addAll(dataT);
+
+
+
             } else {
                 Toast.makeText(this, "You haven't picked Image",
                         Toast.LENGTH_LONG).show();
@@ -260,5 +224,59 @@ public class MainActivity extends Activity {
 
         super.onActivityResult(requestCode, resultCode, data);
     }
-    */
+
+
+	public static String getRealPathFromURI_API19(Context context, Uri uri) {
+		String filePath = "";
+		if (uri.getHost().contains("com.android.providers.media")) {
+			// Image pick from recent
+			String wholeID = null;
+			if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+				wholeID = DocumentsContract.getDocumentId(uri);
+			}
+
+			// Split at colon, use second item in the array
+			String id = wholeID.split(":")[1];
+
+			String[] column = {MediaStore.Images.Media.DATA};
+
+			// where id is equal to
+			String sel = MediaStore.Images.Media._ID + "=?";
+
+			Cursor cursor = context.getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+					column, sel, new String[]{id}, null);
+
+			int columnIndex = cursor.getColumnIndex(column[0]);
+
+			if (cursor.moveToFirst()) {
+				filePath = cursor.getString(columnIndex);
+			}
+			cursor.close();
+			return filePath;
+		} else {
+			// image pick from gallery
+			return  getRealPathFromURI(context,uri);
+
+		}
+
+	}
+
+
+    public static String getRealPathFromURI(Context context, Uri contentUri) {
+        Cursor cursor = null;
+        try {
+            String[] proj = { MediaStore.Images.Media.DATA };
+            cursor = context.getContentResolver().query(contentUri, proj, null,
+                    null, null);
+            int column_index = cursor
+                    .getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            cursor.moveToFirst();
+            return cursor.getString(column_index);
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+    }
+
 }
