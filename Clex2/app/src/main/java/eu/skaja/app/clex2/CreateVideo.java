@@ -5,12 +5,13 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Environment;
 
+import org.jcodec.api.android.SequenceEncoder;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import org.jcodec.api.android.SequenceEncoder;
 
 //Wird als Objekt genutzt, welches in JEncode geladen wird.
 public class CreateVideo extends Activity {
