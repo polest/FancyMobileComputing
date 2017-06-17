@@ -3,7 +3,7 @@
 
     <string name="app_name">Clex</string>
     <string name="btn_ok">Choose Images</string>
-    <string name="btn_pick">Create</string>
+    <string name="btn_pick">Create Video</string>
     <string name="btn_pick_mul">Select images</string>
 
 </resources>
