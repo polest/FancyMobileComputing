@@ -29,7 +29,6 @@ public class GalleryAdapter extends BaseAdapter {
 	ImageLoader imageLoader;
 
 	private boolean isActionMultiplePick;
-	private boolean isHighlight;
 
 	public GalleryAdapter(Context c, ImageLoader imageLoader) {
 		infalter = (LayoutInflater) c
@@ -56,10 +55,6 @@ public class GalleryAdapter extends BaseAdapter {
 
 	public void setMultiplePick(boolean isMultiplePick) {
 		this.isActionMultiplePick = isMultiplePick;
-	}
-
-	public void enableHighlight(boolean isHighlight){
-		this.isHighlight = isHighlight;
 	}
 
 	public void selectAll(boolean selection) {
@@ -108,6 +103,17 @@ public class GalleryAdapter extends BaseAdapter {
 		return dataT;
 	}
 
+
+	public void unselectAll(AdapterView<?> adapterView) {
+		ArrayList<CustomGallery> dataT = new ArrayList<CustomGallery>();
+
+		for (int i = 0; i < data.size(); i++) {
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+				adapterView.getChildAt(i).setBackground(null);
+			}
+		}
+	}
+
 	public void addAll(ArrayList<CustomGallery> files) {
 
 		try {
@@ -123,10 +129,10 @@ public class GalleryAdapter extends BaseAdapter {
 
 	public void changeSelection(View v, int position, int oldPosition, AdapterView<?> l) {
 
-		//Drawable highlight = mContext.getResources().getDrawable( R.drawable.border );
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            l.getChildAt(oldPosition).setBackground(null);
+            if(oldPosition != -1) {
+				l.getChildAt(oldPosition).setBackground(null);
+			}
         }
 
         if (data.get(position).isSeleted) {
@@ -136,7 +142,9 @@ public class GalleryAdapter extends BaseAdapter {
             }
         } else {
 			data.get(position).isSeleted = true;
-            data.get(oldPosition).isSeleted = false;
+			if(oldPosition != -1) {
+				data.get(oldPosition).isSeleted = false;
+			}
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                 v.setBackgroundColor(0xFFB4B4B4);
                 //l.getChildAt(position).setBackgroundColor(0xFFB4B4B4);
