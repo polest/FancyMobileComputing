@@ -148,9 +148,47 @@ public class MainActivity extends Activity {
 		btnStartEditor.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Intent intent = new Intent(MainActivity.this, PhotoEditor.class);
-				intent.putExtra("selectedImagePath", selectedImagePath);
-                startActivity(intent);
+
+
+                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        switch (which){
+                            case DialogInterface.BUTTON_POSITIVE:
+                                viewSwitcher.setDisplayedChild(0);
+                                dataT.remove(selectedImagePos);
+                                adapter.addAll(dataT);
+                                selectedImagePos = -1;
+                                selectedImagePath = null;
+
+                                int y = 0;
+                                for(CustomGallery cg : dataT){
+                                    gridGallery.getChildAt(y).setBackgroundColor(0);
+                                    y++;
+                                }
+
+                                break;
+
+                            case DialogInterface.BUTTON_NEGATIVE:
+                                //No button clicked
+                                break;
+                        }
+                    }
+                };
+
+
+                if(selectedImagePath != null){
+                    Intent intent = new Intent(MainActivity.this, PhotoEditor.class);
+                    intent.putExtra("selectedImagePath", selectedImagePath);
+                    startActivity(intent);
+                } else {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+                    builder.setMessage("Please select an image").setNegativeButton("Ok", dialogClickListener).show();
+                }
+
+
+
 			}
 		});
 
@@ -196,7 +234,6 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
 
-
                 DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -224,9 +261,17 @@ public class MainActivity extends Activity {
                     }
                 };
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
-                builder.setMessage("Do you really want to delete this image?").setPositiveButton("Yes", dialogClickListener)
-                        .setNegativeButton("No", dialogClickListener).show();
+
+                if(selectedImagePos != -1){
+                    AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+                    builder.setMessage("Do you really want to delete this image?").setPositiveButton("Yes", dialogClickListener)
+                            .setNegativeButton("No", dialogClickListener).show();
+                } else {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+                    builder.setMessage("Please select an image").setNegativeButton("Ok", dialogClickListener).show();
+                }
+
+
 
             }
         });
