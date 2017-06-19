@@ -43,11 +43,12 @@ public class MainActivity extends Activity {
     private GridView gridGallery;
     private Handler handler;
     private ImageLoader imageLoader;
-    private ImageView imgSinglePick;
     private int PICK_IMAGE_MULTIPLE = 1;
     private List<String> imagesEncodedList;
     private String action;
-    private String selectedImage;
+    private String selectedImagePath;
+    private int selectedImagePos;
+    private CustomGallery selectedImage;
     private String imageEncoded;
     private ViewSwitcher viewSwitcher;
 	private Button btnSortUp;
@@ -95,16 +96,14 @@ public class MainActivity extends Activity {
             @Override
             public void onItemClick(AdapterView<?> l, View v, int position, long id) {
 
-                Drawable highlight = getResources().getDrawable( R.drawable.border );
+                selectedImagePath = adapter.getItem(position).sdcardPath;
 
-                selectedImage = adapter.getItem(position).sdcardPath;
+                adapter.changeSelection(v,position, selectedImagePos, l);
 
-                Toast.makeText(MainActivity.this, adapter.getItem(position).sdcardPath, Toast.LENGTH_SHORT).show();
-                //adapter.getItem(position).
+                selectedImagePos = position;
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                    v.setBackground(highlight);
-                }
+                //v.setBackgroundColor();
+                //v.set(10,10,10,10);
 
             }
         };
@@ -125,15 +124,11 @@ public class MainActivity extends Activity {
 
 		viewSwitcher.setDisplayedChild(1);
 
-
-		imgSinglePick = (ImageView) findViewById(R.id.imgSinglePick);
-
-
 		btnStartEditor.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				Intent intent = new Intent(MainActivity.this, PhotoEditor.class);
-				intent.putExtra("selectedImagePath", selectedImage);
+				intent.putExtra("selectedImagePath", selectedImagePath);
                 startActivity(intent);
 			}
 		});
@@ -144,7 +139,6 @@ public class MainActivity extends Activity {
 					@Override
 					public void onClick(View v) {
 						Intent intent = new Intent(MainActivity.this, MusicPicker.class);
-						intent.putExtra("selectedImagePath", selectedImage);
 						startActivity(intent);
 					}
 				}
@@ -161,7 +155,6 @@ public class MainActivity extends Activity {
 					}
 				}
 		);
-
 	}
 
 
@@ -169,9 +162,7 @@ public class MainActivity extends Activity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         try {
             // When an Image is picked
-            if (requestCode == PICK_IMAGE_MULTIPLE && resultCode == RESULT_OK
-                    && null != data) {
-
+            if (requestCode == PICK_IMAGE_MULTIPLE && resultCode == RESULT_OK && null != data) {
 
                 imagesEncodedList = new ArrayList<String>();
                 if(data.getData()!=null){
@@ -212,12 +203,10 @@ public class MainActivity extends Activity {
 
 
             } else {
-                Toast.makeText(this, "You haven't picked Image",
-                        Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "No image selected", Toast.LENGTH_LONG).show();
             }
         } catch (Exception e) {
-            Toast.makeText(this, "Something went wrong", Toast.LENGTH_LONG)
-                    .show();
+            Toast.makeText(this, "Something went wrong, please restart the app", Toast.LENGTH_LONG).show();
         }
 
         super.onActivityResult(requestCode, resultCode, data);
@@ -276,5 +265,7 @@ public class MainActivity extends Activity {
             }
         }
     }
+
+
 
 }

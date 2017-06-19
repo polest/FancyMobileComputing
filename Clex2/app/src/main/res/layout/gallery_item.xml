@@ -16,11 +16,12 @@
 
             <ImageView
                 android:id="@+id/imgQueue"
-                android:layout_width="@dimen/photo_width"
-                android:padding="5dp"
+                android:layout_width="wrap_content"
                 android:layout_height="@dimen/photo_height"
                 android:contentDescription="@string/app_name"
                 android:scaleType="centerCrop"
+                android:background="@color/transparent"
+
                 android:src="@drawable/no_media" />
         </FrameLayout>
 

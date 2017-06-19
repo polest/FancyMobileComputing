@@ -163,7 +163,7 @@ public class CustomGalleryActivity extends Activity {
 
 		@Override
 		public void onItemClick(AdapterView<?> l, View v, int position, long id) {
-			adapter.changeSelection(v, position);
+			//adapter.changeSelection(v, position);
 
 		}
 	};
