@@ -34,7 +34,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".MusicPicker" />
-        <activity android:name=".PhotoEditor"></activity>
+        <activity android:name=".PhotoEditor" />
+        <activity android:name=".BuildVideo"></activity>
     </application>
 
 </manifest>

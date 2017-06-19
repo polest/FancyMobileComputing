@@ -8,5 +8,6 @@
         android:layout_height="39dp"
         android:gravity="center_vertical|center_horizontal"
         android:text="TextView"
+        android:textColor="#fff"
         android:textSize="24dp" />
 </FrameLayout>
