@@ -4,12 +4,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -21,6 +23,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -36,6 +39,8 @@ import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
+
+import ly.img.android.ui.utilities.PermissionRequest;
 
 public class MainActivity extends Activity {
 
@@ -207,12 +212,19 @@ public class MainActivity extends Activity {
 				new View.OnClickListener() {
 					@Override
 					public void onClick(View view) {
-                        Intent i = new Intent(Intent.ACTION_GET_CONTENT,android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                        i.setType("image/*");
-                        i.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-                        startActivityForResult(i, PICK_IMAGE_MULTIPLE);
-					}
-				}
+
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                            if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)== PackageManager.PERMISSION_GRANTED) {
+                                Intent i = new Intent(Intent.ACTION_GET_CONTENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                                i.setType("image/*");
+                                i.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                                startActivityForResult(i, PICK_IMAGE_MULTIPLE);
+                            } else {
+                                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
+                            }
+                        }
+                    }
+                }
 		);
 
 		btnCreate.setOnClickListener(
@@ -403,6 +415,8 @@ public class MainActivity extends Activity {
 			btnCreate.setClickable(true);
 		}
 	}
+
+
 
 
 }
