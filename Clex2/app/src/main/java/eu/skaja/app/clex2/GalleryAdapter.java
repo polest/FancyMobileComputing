@@ -3,14 +3,23 @@ package eu.skaja.app.clex2;
 import java.util.ArrayList;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.media.Image;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.Toast;
+import android.graphics.drawable.Drawable;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
+
+import static eu.skaja.app.clex2.R.color.transparent;
 
 public class GalleryAdapter extends BaseAdapter {
 
@@ -94,6 +103,17 @@ public class GalleryAdapter extends BaseAdapter {
 		return dataT;
 	}
 
+
+	public void unselectAll(AdapterView<?> adapterView) {
+		ArrayList<CustomGallery> dataT = new ArrayList<CustomGallery>();
+
+		for (int i = 0; i < data.size(); i++) {
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+				adapterView.getChildAt(i).setBackground(null);
+			}
+		}
+	}
+
 	public void addAll(ArrayList<CustomGallery> files) {
 
 		try {
@@ -107,17 +127,35 @@ public class GalleryAdapter extends BaseAdapter {
 		notifyDataSetChanged();
 	}
 
-	public void changeSelection(View v, int position) {
+	public void changeSelection(View v, int position, int oldPosition, AdapterView<?> l) {
 
-		if (data.get(position).isSeleted) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            if(oldPosition != -1) {
+				l.getChildAt(oldPosition).setBackground(null);
+			}
+        }
+
+        if (data.get(position).isSeleted) {
 			data.get(position).isSeleted = false;
-		} else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                v.setBackground(null);
+            }
+        } else {
 			data.get(position).isSeleted = true;
+			if(oldPosition != -1) {
+				data.get(oldPosition).isSeleted = false;
+			}
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                v.setBackgroundColor(0xFFB4B4B4);
+                //l.getChildAt(position).setBackgroundColor(0xFFB4B4B4);
+            }
 		}
 
 		((ViewHolder) v.getTag()).imgQueueMultiSelected.setSelected(data
 				.get(position).isSeleted);
-	}
+
+
+    }
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
