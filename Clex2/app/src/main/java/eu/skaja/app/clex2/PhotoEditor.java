@@ -24,6 +24,8 @@ import ly.img.android.sdk.models.state.manager.SettingsList;
 public class PhotoEditor extends Activity implements PermissionRequest.Response {
 
     public static int CAMERA_PREVIEW_RESULT = 1;
+    private String selectedImagePath;
+    private int selectedImagePos;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +34,8 @@ public class PhotoEditor extends Activity implements PermissionRequest.Response 
 
         Bundle b = new Bundle();
         b = getIntent().getExtras();
-        String selectedImagePath = b.getString("selectedImagePath");
+        selectedImagePath = b.getString("selectedImagePath");
+        selectedImagePos = b.getInt("selectedImagePos");
 
         SettingsList settingsList = new SettingsList();
         String myPicture = selectedImagePath;
@@ -79,9 +82,17 @@ public class PhotoEditor extends Activity implements PermissionRequest.Response 
                 sendBroadcast(scanIntent);
             }
 
-            Toast.makeText(this, "Image Save on: " + resultPath, Toast.LENGTH_LONG).show();
+            //Toast.makeText(this, "Image Save on: " + resultPath, Toast.LENGTH_LONG).show();
+
+
+            Intent returnIntent = new Intent();
+            returnIntent.putExtra("getNewPath",resultPath);
+            returnIntent.putExtra("getImagePos", selectedImagePos);
+            setResult(Activity.RESULT_OK,returnIntent);
+            finish();
+
         }
-        finish();
+
     }
 
     // Important permission request for Android 6.0 and above, don't forget this!

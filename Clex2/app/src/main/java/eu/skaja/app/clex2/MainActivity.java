@@ -14,17 +14,12 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
@@ -40,8 +35,6 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 
-import ly.img.android.ui.utilities.PermissionRequest;
-
 public class MainActivity extends Activity {
 
 
@@ -53,8 +46,8 @@ public class MainActivity extends Activity {
 	private Button btnDelete;
 	private Button btnPickMusic;
 	private Button btnSelectImages;
-	private Button btnSortDown;
-	private Button btnSortUp;
+	private Button btnSortLeft;
+	private Button btnSortRight;
 	private Button btnStartEditor;
 	private GalleryAdapter adapter;
 	private GridView gridGallery;
@@ -62,6 +55,7 @@ public class MainActivity extends Activity {
 	private ImageLoader imageLoader;
 	private ImageView imgSinglePick;
 	private int PICK_IMAGE_MULTIPLE = 1;
+    private int EDITOR_RESULT = 0;
 	private List<String> imagesEncodedList;
 	private String action;
 	private String imageEncoded;
@@ -114,9 +108,10 @@ public class MainActivity extends Activity {
             public void onItemClick(AdapterView<?> l, View v, int position, long id) {
 
                 if(selectedImagePos == position && toggle == 1){
-                    // unselect bild
+                    // unselect image
                     adapter.unselectAll(l);
                     selectedImagePath = null;
+                    selectedImagePos = -1;
                     toggle = 0;
 
                 } else {
@@ -126,10 +121,11 @@ public class MainActivity extends Activity {
                         l.getChildAt(position).setBackgroundColor(0xFF1cc845);
                     }
                     selectedImagePath = adapter.getItem(position).sdcardPath;
+                    selectedImagePos = position;
                     toggle = 1;
                 }
 
-                selectedImagePos = position;
+
 
             }
         };
@@ -137,8 +133,8 @@ public class MainActivity extends Activity {
         //Leiste oben
 		btnCreate = (Button) findViewById(R.id.btnCreate);
 		btnDelete = (Button)findViewById(R.id.btnDelete);
-		btnSortDown = (Button)findViewById(R.id.btnSortDown);
-		btnSortUp = (Button)findViewById(R.id.btnSortUp);
+		btnSortRight = (Button)findViewById(R.id.btnSortDown);
+		btnSortLeft = (Button)findViewById(R.id.btnSortUp);
 		btnPickMusic = (Button) findViewById(R.id.btnPickMusic);
 		btnStartEditor = (Button)findViewById(R.id.btnStartEditor);
 		btnSelectImages = (Button) findViewById(R.id.btnSelectImages);
@@ -186,7 +182,8 @@ public class MainActivity extends Activity {
                 if(selectedImagePath != null){
                     Intent intent = new Intent(MainActivity.this, PhotoEditor.class);
                     intent.putExtra("selectedImagePath", selectedImagePath);
-                    startActivity(intent);
+                    intent.putExtra("selectedImagePos", selectedImagePos);
+                    startActivityForResult(intent, EDITOR_RESULT);
                 } else {
                     AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
                     builder.setMessage("Please select an image").setNegativeButton("Ok", dialogClickListener).show();
@@ -195,7 +192,7 @@ public class MainActivity extends Activity {
 
 
 			}
-		});
+        });
 
 		this.musicPath = "";
 		btnPickMusic.setOnClickListener(
@@ -242,6 +239,61 @@ public class MainActivity extends Activity {
 				}
 		);
 
+
+		btnSortLeft.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+
+
+                if(selectedImagePos-1 >= 0) {
+
+                    CustomGallery leftImageTemp = dataT.get(selectedImagePos - 1);
+
+                    dataT.set((selectedImagePos - 1), dataT.get(selectedImagePos));
+                    dataT.set(selectedImagePos, leftImageTemp);
+
+                    adapter.addAll(dataT);
+
+                    adapter.unselectAll(gridGallery);
+
+                    selectedImagePos = selectedImagePos - 1;
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                        gridGallery.getChildAt(selectedImagePos).setBackgroundColor(0xFF1cc845);
+                    }
+
+                }
+			}
+		});
+
+
+        btnSortRight.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+                if(selectedImagePos+1 <= dataT.size()-1) {
+
+                    CustomGallery rightImageTemp = dataT.get(selectedImagePos + 1);
+
+                    dataT.set((selectedImagePos + 1), dataT.get(selectedImagePos));
+                    dataT.set(selectedImagePos, rightImageTemp);
+
+                    adapter.addAll(dataT);
+
+                    adapter.unselectAll(gridGallery);
+
+                    selectedImagePos = selectedImagePos + 1;
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                        gridGallery.getChildAt(selectedImagePos).setBackgroundColor(0xFF1cc845);
+                    }
+
+                }
+            }
+        });
+
+
         btnDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -287,6 +339,11 @@ public class MainActivity extends Activity {
 
             }
         });
+
+
+
+
+
 
 	}
 
@@ -342,7 +399,7 @@ public class MainActivity extends Activity {
                 Toast.makeText(this, "No image selected", Toast.LENGTH_LONG).show();
             }
         } catch (Exception e) {
-            Toast.makeText(this, "Something went wrong, please restart the app", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Something went wrong, please try again", Toast.LENGTH_LONG).show();
         }
 
 		// Get the selected music for the video
@@ -353,6 +410,22 @@ public class MainActivity extends Activity {
 			// that the music for the video is selected
 			this.musicPicked = true;
 		}
+
+        if (requestCode == EDITOR_RESULT && resultCode == RESULT_OK) {
+
+                String newPath=data.getStringExtra("getNewPath");
+				int imagePos = data.getIntExtra("getImagePos", -1);
+
+                CustomGallery cgNew = new CustomGallery();
+                cgNew.sdcardPath = newPath;
+                cgNew.position = imagePos;
+
+				dataT.set(imagePos, cgNew);
+                adapter.addAll(dataT);
+
+        }
+
+
     }
 
 	public static String getRealPathFromURI_API19(Context context, Uri uri) {
