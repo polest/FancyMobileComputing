@@ -55,7 +55,7 @@ public class MainActivity extends Activity {
 	private ImageLoader imageLoader;
 	private ImageView imgSinglePick;
 	private int PICK_IMAGE_MULTIPLE = 1;
-    private int EDITOR_RESULT = 1;
+    private int EDITOR_RESULT = 0;
 	private List<String> imagesEncodedList;
 	private String action;
 	private String imageEncoded;
@@ -411,14 +411,18 @@ public class MainActivity extends Activity {
 			this.musicPicked = true;
 		}
 
-        if (requestCode == EDITOR_RESULT) {
-            if(resultCode == Activity.RESULT_OK){
-                String result=data.getStringExtra("result");
-                //Toast.makeText(getApplicationContext(), result, Toast.LENGTH_SHORT).show();
-            }
-            if (resultCode == Activity.RESULT_CANCELED) {
-                //Write your code if there's no result
-            }
+        if (requestCode == EDITOR_RESULT && resultCode == RESULT_OK) {
+
+                String newPath=data.getStringExtra("getNewPath");
+				int imagePos = data.getIntExtra("getImagePos", -1);
+
+                CustomGallery cgNew = new CustomGallery();
+                cgNew.sdcardPath = newPath;
+                cgNew.position = imagePos;
+
+				dataT.set(imagePos, cgNew);
+                adapter.addAll(dataT);
+
         }
 
 
