@@ -22,7 +22,7 @@
                 android:contentDescription="@string/app_name"
                 android:scaleType="centerCrop"
                 android:background="@color/transparent"
-                android:src="@drawable/no_media" />
+                android:src="@drawable/loading" />
         </FrameLayout>
 
         <ImageView
