@@ -79,9 +79,16 @@ public class PhotoEditor extends Activity implements PermissionRequest.Response 
                 sendBroadcast(scanIntent);
             }
 
-            Toast.makeText(this, "Image Save on: " + resultPath, Toast.LENGTH_LONG).show();
+            //Toast.makeText(this, "Image Save on: " + resultPath, Toast.LENGTH_LONG).show();
+
+
+            Intent returnIntent = new Intent();
+            returnIntent.putExtra("result",resultPath);
+            setResult(Activity.RESULT_OK,returnIntent);
+            finish();
+
         }
-        finish();
+
     }
 
     // Important permission request for Android 6.0 and above, don't forget this!
