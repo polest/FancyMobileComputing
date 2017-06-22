@@ -4,21 +4,22 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
@@ -36,14 +37,17 @@ import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 
 public class MainActivity extends Activity {
 
+
+    private String selectedImagePath = null;
+    private int selectedImagePos = -1;
 	private boolean imagesPicked = false;
 	private boolean musicPicked = false;
 	private Button btnCreate;
 	private Button btnDelete;
 	private Button btnPickMusic;
 	private Button btnSelectImages;
-	private Button btnSortDown;
-	private Button btnSortUp;
+	private Button btnSortLeft;
+	private Button btnSortRight;
 	private Button btnStartEditor;
 	private GalleryAdapter adapter;
 	private GridView gridGallery;
@@ -51,13 +55,17 @@ public class MainActivity extends Activity {
 	private ImageLoader imageLoader;
 	private ImageView imgSinglePick;
 	private int PICK_IMAGE_MULTIPLE = 1;
+    private int EDITOR_RESULT = 0;
 	private List<String> imagesEncodedList;
 	private String action;
 	private String imageEncoded;
 	private String musicPath;
 	private String selectedImage;
+    private int toggle;
 	private ViewSwitcher viewSwitcher;
+	private AdapterView<?> adapterView;
 	private CreateVideo video;
+    ArrayList<CustomGallery> dataT = new ArrayList<CustomGallery>();
 
 	public static final int CAMERA_PREVIEW_RESULT = 1;
 	public static final int MUSIC_PICKER = 2;
@@ -99,16 +107,25 @@ public class MainActivity extends Activity {
             @Override
             public void onItemClick(AdapterView<?> l, View v, int position, long id) {
 
-                Drawable highlight = getResources().getDrawable( R.drawable.border );
+                if(selectedImagePos == position && toggle == 1){
+                    // unselect image
+                    adapter.unselectAll(l);
+                    selectedImagePath = null;
+                    selectedImagePos = -1;
+                    toggle = 0;
 
-                selectedImage = adapter.getItem(position).sdcardPath;
-
-                Toast.makeText(MainActivity.this, adapter.getItem(position).sdcardPath, Toast.LENGTH_SHORT).show();
-                //adapter.getItem(position).
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                    v.setBackground(highlight);
+                } else {
+                    // select selected
+                    adapter.unselectAll(l);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                        l.getChildAt(position).setBackgroundColor(0xFF1cc845);
+                    }
+                    selectedImagePath = adapter.getItem(position).sdcardPath;
+                    selectedImagePos = position;
+                    toggle = 1;
                 }
+
+
 
             }
         };
@@ -116,8 +133,8 @@ public class MainActivity extends Activity {
         //Leiste oben
 		btnCreate = (Button) findViewById(R.id.btnCreate);
 		btnDelete = (Button)findViewById(R.id.btnDelete);
-		btnSortDown = (Button)findViewById(R.id.btnSortDown);
-		btnSortUp = (Button)findViewById(R.id.btnSortUp);
+		btnSortRight = (Button)findViewById(R.id.btnSortDown);
+		btnSortLeft = (Button)findViewById(R.id.btnSortUp);
 		btnPickMusic = (Button) findViewById(R.id.btnPickMusic);
 		btnStartEditor = (Button)findViewById(R.id.btnStartEditor);
 		btnSelectImages = (Button) findViewById(R.id.btnSelectImages);
@@ -129,16 +146,53 @@ public class MainActivity extends Activity {
 
 		viewSwitcher.setDisplayedChild(1);
 
-		//checkCreation();
-
 		btnStartEditor.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Intent intent = new Intent(MainActivity.this, PhotoEditor.class);
-				intent.putExtra("selectedImagePath", selectedImage);
-                startActivity(intent);
+
+
+                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        switch (which){
+                            case DialogInterface.BUTTON_POSITIVE:
+                                viewSwitcher.setDisplayedChild(0);
+                                dataT.remove(selectedImagePos);
+                                adapter.addAll(dataT);
+                                selectedImagePos = -1;
+                                selectedImagePath = null;
+
+                                int y = 0;
+                                for(CustomGallery cg : dataT){
+                                    gridGallery.getChildAt(y).setBackgroundColor(0);
+                                    y++;
+                                }
+
+                                break;
+
+                            case DialogInterface.BUTTON_NEGATIVE:
+                                //No button clicked
+                                break;
+                        }
+                    }
+                };
+
+
+                if(selectedImagePath != null){
+                    Intent intent = new Intent(MainActivity.this, PhotoEditor.class);
+                    intent.putExtra("selectedImagePath", selectedImagePath);
+                    intent.putExtra("selectedImagePos", selectedImagePos);
+                    startActivityForResult(intent, EDITOR_RESULT);
+                } else {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+                    builder.setMessage("Please select an image").setNegativeButton("Ok", dialogClickListener).show();
+                }
+
+
+
 			}
-		});
+        });
 
 		this.musicPath = "";
 		btnPickMusic.setOnClickListener(
@@ -155,12 +209,19 @@ public class MainActivity extends Activity {
 				new View.OnClickListener() {
 					@Override
 					public void onClick(View view) {
-                        Intent i = new Intent(Intent.ACTION_GET_CONTENT,android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                        i.setType("image/*");
-                        i.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-                        startActivityForResult(i, PICK_IMAGE_MULTIPLE);
-					}
-				}
+
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                            if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)== PackageManager.PERMISSION_GRANTED) {
+                                Intent i = new Intent(Intent.ACTION_GET_CONTENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                                i.setType("image/*");
+                                i.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                                startActivityForResult(i, PICK_IMAGE_MULTIPLE);
+                            } else {
+                                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
+                            }
+                        }
+                    }
+                }
 		);
 
 		btnCreate.setOnClickListener(
@@ -177,6 +238,113 @@ public class MainActivity extends Activity {
 					}
 				}
 		);
+
+
+		btnSortLeft.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+
+
+                if(selectedImagePos-1 >= 0) {
+
+                    CustomGallery leftImageTemp = dataT.get(selectedImagePos - 1);
+
+                    dataT.set((selectedImagePos - 1), dataT.get(selectedImagePos));
+                    dataT.set(selectedImagePos, leftImageTemp);
+
+                    adapter.addAll(dataT);
+
+                    adapter.unselectAll(gridGallery);
+
+                    selectedImagePos = selectedImagePos - 1;
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                        gridGallery.getChildAt(selectedImagePos).setBackgroundColor(0xFF1cc845);
+                    }
+
+                }
+			}
+		});
+
+
+        btnSortRight.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+                if(selectedImagePos+1 <= dataT.size()-1) {
+
+                    CustomGallery rightImageTemp = dataT.get(selectedImagePos + 1);
+
+                    dataT.set((selectedImagePos + 1), dataT.get(selectedImagePos));
+                    dataT.set(selectedImagePos, rightImageTemp);
+
+                    adapter.addAll(dataT);
+
+                    adapter.unselectAll(gridGallery);
+
+                    selectedImagePos = selectedImagePos + 1;
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                        gridGallery.getChildAt(selectedImagePos).setBackgroundColor(0xFF1cc845);
+                    }
+
+                }
+            }
+        });
+
+
+        btnDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        switch (which){
+                            case DialogInterface.BUTTON_POSITIVE:
+                            	viewSwitcher.setDisplayedChild(0);
+                                dataT.remove(selectedImagePos);
+                                adapter.addAll(dataT);
+                                selectedImagePos = -1;
+                                selectedImagePath = null;
+
+                                int y = 0;
+                                for(CustomGallery cg : dataT){
+                                    gridGallery.getChildAt(y).setBackgroundColor(0);
+                                    y++;
+                                }
+
+                                break;
+
+                            case DialogInterface.BUTTON_NEGATIVE:
+                                //No button clicked
+                                break;
+                        }
+                    }
+                };
+
+
+                if(selectedImagePos != -1){
+                    AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+                    builder.setMessage("Do you really want to delete this image?").setPositiveButton("Yes", dialogClickListener)
+                            .setNegativeButton("No", dialogClickListener).show();
+                } else {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+                    builder.setMessage("Please select an image").setNegativeButton("Ok", dialogClickListener).show();
+                }
+
+
+
+            }
+        });
+
+
+
+
+
+
 	}
 
 	@Override
@@ -186,7 +354,6 @@ public class MainActivity extends Activity {
 			// When an Image is picked
 			if (requestCode == PICK_IMAGE_MULTIPLE && resultCode == RESULT_OK
                     && null != data) {
-
 
 				imagesEncodedList = new ArrayList<String>();
 				if(data.getData()!=null){
@@ -214,27 +381,26 @@ public class MainActivity extends Activity {
 					}
 				}
 
-				ArrayList<CustomGallery> dataT = new ArrayList<CustomGallery>();
+				int x = 0;
+
 				for (String string : imagesEncodedList) {
 					CustomGallery item = new CustomGallery();
 					item.sdcardPath = string;
+                    item.position = x;
 					dataT.add(item);
+                    x++;
 				}
 
 				viewSwitcher.setDisplayedChild(0);
 				adapter.addAll(dataT);
 				this.imagesPicked = true;
 
-
-
-			} else {
-				Toast.makeText(this, "You haven't picked Image",
-                        Toast.LENGTH_LONG).show();
-			}
-		} catch (Exception e) {
-			Toast.makeText(this, "Something went wrong", Toast.LENGTH_LONG)
-                    .show();
-		}
+            } else {
+                Toast.makeText(this, "No image selected", Toast.LENGTH_LONG).show();
+            }
+        } catch (Exception e) {
+            Toast.makeText(this, "Something went wrong, please try again", Toast.LENGTH_LONG).show();
+        }
 
 		// Get the selected music for the video
 		if(requestCode == MUSIC_PICKER && resultCode == RESULT_OK){
@@ -244,6 +410,22 @@ public class MainActivity extends Activity {
 			// that the music for the video is selected
 			this.musicPicked = true;
 		}
+
+        if (requestCode == EDITOR_RESULT && resultCode == RESULT_OK) {
+
+                String newPath=data.getStringExtra("getNewPath");
+				int imagePos = data.getIntExtra("getImagePos", -1);
+
+                CustomGallery cgNew = new CustomGallery();
+                cgNew.sdcardPath = newPath;
+                cgNew.position = imagePos;
+
+				dataT.set(imagePos, cgNew);
+                adapter.addAll(dataT);
+
+        }
+
+
     }
 
 	public static String getRealPathFromURI_API19(Context context, Uri uri) {
@@ -306,5 +488,8 @@ public class MainActivity extends Activity {
 			btnCreate.setClickable(true);
 		}
 	}
+
+
+
 
 }
