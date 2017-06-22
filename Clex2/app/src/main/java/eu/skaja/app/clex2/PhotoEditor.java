@@ -24,6 +24,8 @@ import ly.img.android.sdk.models.state.manager.SettingsList;
 public class PhotoEditor extends Activity implements PermissionRequest.Response {
 
     public static int CAMERA_PREVIEW_RESULT = 1;
+    private String selectedImagePath;
+    private int selectedImagePos;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +34,8 @@ public class PhotoEditor extends Activity implements PermissionRequest.Response 
 
         Bundle b = new Bundle();
         b = getIntent().getExtras();
-        String selectedImagePath = b.getString("selectedImagePath");
+        selectedImagePath = b.getString("selectedImagePath");
+        selectedImagePos = b.getInt("selectedImagePos");
 
         SettingsList settingsList = new SettingsList();
         String myPicture = selectedImagePath;
@@ -83,7 +86,8 @@ public class PhotoEditor extends Activity implements PermissionRequest.Response 
 
 
             Intent returnIntent = new Intent();
-            returnIntent.putExtra("result",resultPath);
+            returnIntent.putExtra("getNewPath",resultPath);
+            returnIntent.putExtra("getImagePos", selectedImagePos);
             setResult(Activity.RESULT_OK,returnIntent);
             finish();
 
