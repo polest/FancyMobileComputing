@@ -55,7 +55,7 @@ public class MainActivity extends Activity {
 	private ImageLoader imageLoader;
 	private ImageView imgSinglePick;
 	private int PICK_IMAGE_MULTIPLE = 1;
-    private int EDITOR_RESULT = 0;
+    private int EDITOR_RESULT = 2;
 	private List<String> imagesEncodedList;
 	private String action;
 	private String imageEncoded;
@@ -67,8 +67,8 @@ public class MainActivity extends Activity {
 	private CreateVideo video;
     ArrayList<CustomGallery> dataT = new ArrayList<CustomGallery>();
 
-	public static final int CAMERA_PREVIEW_RESULT = 1;
-	public static final int MUSIC_PICKER = 2;
+	public static final int CAMERA_PREVIEW_RESULT = 3;
+	public static final int MUSIC_PICKER = 4;
 
 
 	@Override
@@ -395,8 +395,6 @@ public class MainActivity extends Activity {
 				adapter.addAll(dataT);
 				this.imagesPicked = true;
 
-            } else {
-                Toast.makeText(this, "No image selected", Toast.LENGTH_LONG).show();
             }
         } catch (Exception e) {
             Toast.makeText(this, "Something went wrong, please try again", Toast.LENGTH_LONG).show();
