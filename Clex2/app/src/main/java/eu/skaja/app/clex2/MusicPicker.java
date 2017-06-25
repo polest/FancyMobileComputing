@@ -33,7 +33,6 @@ public class MusicPicker extends Activity {
     private ListView musicList;
     private MediaPlayer mPlayer = null;
     private Button btnConfirmMusic;
-    private Button btnSelectAndroidMusic;
     String musicPath;
 
     @Override
@@ -57,7 +56,6 @@ public class MusicPicker extends Activity {
         );
 
         musicList = (ListView)findViewById(R.id.musicList);
-        btnSelectAndroidMusic = (Button) findViewById(R.id.btnSelectAndroidMusic);
 
         String[] values = new String[] {
                 "Africa",
@@ -124,24 +122,6 @@ public class MusicPicker extends Activity {
             }
 
         });
-
-        btnSelectAndroidMusic.setOnClickListener(
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                            if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)== PackageManager.PERMISSION_GRANTED) {
-                                Intent i = new Intent(Intent.ACTION_GET_CONTENT, MediaStore.Audio.Media.EXTERNAL_CONTENT_URI);
-                                i.setType("audio/*");
-                                i.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-                                //startActivityForResult(i, PICK_IMAGE_MULTIPLE);
-                            } else {
-                                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
-                            }
-                        }
-                    }
-                }
-        );
 
 
 
