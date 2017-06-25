@@ -1,7 +1,11 @@
 package eu.skaja.app.clex2;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.res.AssetFileDescriptor;
+import android.content.res.Resources;
 import android.media.MediaCodec;
+import android.media.MediaExtractor;
 import android.media.MediaFormat;
 import android.media.MediaMuxer;
 import android.graphics.Bitmap;
@@ -9,6 +13,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Movie;
 import android.os.Environment;
 import android.provider.ContactsContract;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.coremedia.iso.boxes.Container;
@@ -26,6 +31,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
+import static android.content.ContentValues.TAG;
+
 //Wird als Objekt genutzt, welches in JEncode geladen wird.
 
 public class CreateVideo{
@@ -36,6 +43,7 @@ public class CreateVideo{
     private String filename;
     private String videoPath;
     private final String folder = "Clex";
+    private static final int MAX_SAMPLE_SIZE = 256 * 1024;
 
     public CreateVideo(ArrayList<String> imagePathList, String musicPath, int fps) throws IOException {
         this.imagePathList = imagePathList;
@@ -63,40 +71,100 @@ public class CreateVideo{
                 }
             }*/
             encoder.finish();
+            videoPath = file.getAbsolutePath();
+            startMuxing();
             //Toast.makeText(,"Video has been created!", Toast.LENGTH_LONG);
         }catch (IOException ex){
             ex.printStackTrace();
         }
 }
 
-        // Combine video with music track
-      /*public void combine(String videoPath, String musicPath){
-          MediaMuxer muxer = new MediaMuxer("temp.mp4", OutputFormat.MUXER_OUTPUT_MPEG_4);
-          // More often, the MediaFormat will be retrieved from MediaCodec.getOutputFormat()
-          // or MediaExtractor.getTrackFormat().
-          MediaFormat audioFormat = new MediaFormat();
-          MediaFormat videoFormat = new MediaFormat();
-          int audioTrackIndex = muxer.addTrack(audioFormat);
-          int videoTrackIndex = muxer.addTrack(videoFormat);
-          ByteBuffer inputBuffer = ByteBuffer.allocate(bufferSize);
-          boolean finished = false;
-          MediaCodec.BufferInfo bufferInfo = new MediaCodec.BufferInfo();
+    public void startMuxing(){
+        MediaMuxer muxer = null;
+        MediaFormat VideoFormat = null;
+        //Resources mResources = context.getResources();
+        //int sourceVideo = R.raw.vid;
+        String outputVideoFileName = filename;
+        try {
+            muxer = new MediaMuxer(outputVideoFileName, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        MediaExtractor extractorVideo = new MediaExtractor();
+        try {
+            /*AssetFileDescriptor srcVideoFd = mResources.)
+            extractorVideo.setDataSource((srcVideoFd.getFileDescriptor(), srcVideoFd.getStartOffset(), srcVideoFd.getLength());*/
+            extractorVideo.setDataSource(videoPath);
+            int tracks = extractorVideo.getTrackCount();
+            for (int i = 0; i < tracks; i++) {
+                MediaFormat mf = extractorVideo.getTrackFormat(i);
+                String mime = mf.getString(MediaFormat.KEY_MIME);
+                if (mime.startsWith("video/")) {
+                    extractorVideo.selectTrack(i);
+                    VideoFormat = extractorVideo.getTrackFormat(i);
+                    break;
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-          muxer.start();
-          while(!finished) {
-              // getInputBuffer() will fill the inputBuffer with one frame of encoded
-              // sample from either MediaCodec or MediaExtractor, set isAudioSample to
-              // true when the sample is audio data, set up all the fields of bufferInfo,
-              // and return true if there are no more samples.
-              finished = getInputBuffer(inputBuffer, isAudioSample, bufferInfo);
-              if (!finished) {
-                  int currentTrackIndex = isAudioSample ? audioTrackIndex : videoTrackIndex;
-                  muxer.writeSampleData(currentTrackIndex, inputBuffer, bufferInfo);
-              }
-          };
-          muxer.stop();
-          muxer.release();
-    }*/
+        MediaExtractor extractorAudio = new MediaExtractor();
+        try {
+            extractorAudio.setDataSource(musicPath);
+            int tracks = extractorAudio.getTrackCount();
+            extractorAudio.selectTrack(0);
+
+            MediaFormat AudioFormat = extractorAudio.getTrackFormat(0);
+            int audioTrackIndex = muxer.addTrack(AudioFormat);
+            int videoTrackIndex = muxer.addTrack(VideoFormat);
+
+            boolean sawEOS = false;
+            boolean sawAudioEOS = false;
+            int bufferSize = MAX_SAMPLE_SIZE;
+            ByteBuffer dstBuf = ByteBuffer.allocate(bufferSize);
+            int offset = 100;
+            MediaCodec.BufferInfo bufferInfo = new MediaCodec.BufferInfo();
+            muxer.start();
+
+            while (!sawEOS) {
+                bufferInfo.offset = offset;
+                bufferInfo.size = extractorVideo.readSampleData(dstBuf, offset);
+                if (bufferInfo.size < 0) {
+                    sawEOS = true;
+                    bufferInfo.size = 0;
+                } else {
+                    bufferInfo.presentationTimeUs = extractorVideo.getSampleTime();
+                    //bufferInfo.flags = extractorVideo.getSampleFlags();
+                    int trackIndex = extractorVideo.getSampleTrackIndex();
+                    muxer.writeSampleData(videoTrackIndex, dstBuf, bufferInfo);
+                    extractorVideo.advance();
+                }
+            }
+            ByteBuffer audioBuf = ByteBuffer.allocate(bufferSize);
+            while (!sawAudioEOS) {
+                bufferInfo.offset = offset;
+                bufferInfo.size = extractorAudio.readSampleData(audioBuf, offset);
+                if (bufferInfo.size < 0) {
+                    sawAudioEOS = true;
+                    bufferInfo.size = 0;
+                } else {
+                    bufferInfo.presentationTimeUs = extractorAudio.getSampleTime();
+                    //bufferInfo.flags = extractorAudio.getSampleFlags();
+                    int trackIndex = extractorAudio.getSampleTrackIndex();
+                    muxer.writeSampleData(audioTrackIndex, audioBuf, bufferInfo);
+                    extractorAudio.advance();
+                }
+            }
+            muxer.stop();
+            muxer.release();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+    }
 
     public String getVideoTitle() {
         Date date = new Date(); // your date
