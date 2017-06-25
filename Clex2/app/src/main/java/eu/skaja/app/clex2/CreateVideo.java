@@ -10,15 +10,19 @@ import android.media.MediaFormat;
 import android.media.MediaMuxer;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Movie;
 import android.os.Environment;
 import android.provider.ContactsContract;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.coremedia.iso.boxes.Container;
+import com.googlecode.mp4parser.FileDataSourceImpl;
+import com.googlecode.mp4parser.authoring.Movie;
 import com.googlecode.mp4parser.authoring.Track;
+import com.googlecode.mp4parser.authoring.builder.DefaultMp4Builder;
 import com.googlecode.mp4parser.authoring.container.mp4.MovieCreator;
+import com.googlecode.mp4parser.authoring.tracks.AACTrackImpl;
+import com.googlecode.mp4parser.authoring.tracks.h264.H264TrackImpl;
 
 import org.jcodec.api.android.SequenceEncoder;
 import java.io.File;
@@ -72,12 +76,39 @@ public class CreateVideo{
             }*/
             encoder.finish();
             videoPath = file.getAbsolutePath();
-            startMuxing();
+
+            //MP4-PARSER
+            startMuxingParser(videoPath, musicPath);
+
+
+            //startMuxing();
             //Toast.makeText(,"Video has been created!", Toast.LENGTH_LONG);
         }catch (IOException ex){
             ex.printStackTrace();
         }
 }
+
+    public void startMuxingParser(String videoPath, String soundPath) {
+        try {
+            H264TrackImpl h264Track = new H264TrackImpl(new FileDataSourceImpl(videoPath));
+            AACTrackImpl aacTrack = new AACTrackImpl(new FileDataSourceImpl(soundPath));
+
+            Movie movie = new Movie();
+            movie.addTrack(h264Track);
+            movie.addTrack(aacTrack);
+
+            Container mp4file = new DefaultMp4Builder().build(movie);
+
+            FileChannel fc = new FileOutputStream(new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + File.separator + folder + File.separator + filename)).getChannel();
+            mp4file.writeContainer(fc);
+            fc.close();
+
+
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+
+    }
 
     public void startMuxing(){
         MediaMuxer muxer = null;

@@ -52,10 +52,15 @@ dependencies {
 
     compile 'ly.img.android:photo-editor-sdk:4.0.2'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
+    compile group: 'com.googlecode.mp4parser', name: 'isoparser', version: '1.1.22'
     compile 'org.jcodec:jcodec-android:0.1.9'
-    compile 'com.googlecode.mp4parser:isoparser:1.0.5.4'
+    //compile 'com.googlecode.mp4parser:isoparser:1.0.5.4'
     testCompile 'junit:junit:4.12'
     apt 'ly.img.android:build-processor:4.0.2'
 }
+
+// https://mvnrepository.com/artifact/com.googlecode.mp4parser/isoparser
+
+
 
 
