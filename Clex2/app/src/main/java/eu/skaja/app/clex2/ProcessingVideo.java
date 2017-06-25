@@ -6,6 +6,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.SeekBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.IOException;
@@ -16,6 +18,9 @@ import static eu.skaja.app.clex2.MainActivity.VIDEO_SETTING;
 
 public class ProcessingVideo extends Activity {
 
+    private SeekBar seekBar;
+    private TextView txtCurrentDuration;
+    private int duration = 0;
     private ArrayList<String> selectedImagesPathList;
     private String musicPath;
     private Button btnProcessVideo;
@@ -26,6 +31,34 @@ public class ProcessingVideo extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_processing_video);
+
+        txtCurrentDuration = (TextView) findViewById(R.id.txtCurrentDuration);
+
+
+        seekBar = (SeekBar) findViewById(R.id.seekBar);
+        seekBar.setOnSeekBarChangeListener(
+                new SeekBar.OnSeekBarChangeListener() {
+
+                    @Override
+                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                        duration = (seekBar.getProgress() + 1);
+                        txtCurrentDuration.setText("Current duration: " + duration + " seconds");
+
+
+                    }
+
+                    @Override
+                    public void onStartTrackingTouch(SeekBar seekBar) {
+
+                    }
+
+                    @Override
+                    public void onStopTrackingTouch(SeekBar seekBar) {
+
+                    }
+                }
+        );
+
 
         btnProcessVideo = (Button) findViewById(R.id.btnProcessVideo);
         Bundle bundle;
