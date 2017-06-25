@@ -6,5 +6,9 @@ public class CustomGallery {
 	public boolean isSeleted = false;
     public int position;
 
+	public String getPath(){
+		return this.sdcardPath;
+	}
+
 
 }

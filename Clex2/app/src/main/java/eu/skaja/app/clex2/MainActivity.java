@@ -3,7 +3,6 @@ package eu.skaja.app.clex2;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -54,20 +53,20 @@ public class MainActivity extends Activity {
 	private Handler handler;
 	private ImageLoader imageLoader;
 	private ImageView imgSinglePick;
-	private int PICK_IMAGE_MULTIPLE = 1;
     private int EDITOR_RESULT = 0;
+	private int toggle;
 	private List<String> imagesEncodedList;
 	private String action;
 	private String imageEncoded;
 	private String musicPath;
 	private String selectedImage;
-    private int toggle;
 	private ViewSwitcher viewSwitcher;
 	private AdapterView<?> adapterView;
 	private CreateVideo video;
-    ArrayList<CustomGallery> dataT = new ArrayList<CustomGallery>();
+	private ArrayList<CustomGallery> dataT = new ArrayList<CustomGallery>();
+	private ArrayList<String> selectedImagesPathList;
 
-	public static final int CAMERA_PREVIEW_RESULT = 1;
+	public static final int PICK_IMAGE_MULTIPLE = 1;
 	public static final int MUSIC_PICKER = 2;
 
 
@@ -228,6 +227,7 @@ public class MainActivity extends Activity {
 				new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
+						selectedImagesPathList = extractPathFromCustomGallery(dataT);
 						try {
 							// Create video with given image paths and music path
 							Toast.makeText(getApplicationContext(),"Video ist created",Toast.LENGTH_SHORT).show();
@@ -489,6 +489,15 @@ public class MainActivity extends Activity {
 		}
 	}
 
+	// Extract the path from custom gallery objects which is necessary for creating a video
+	public ArrayList<String> extractPathFromCustomGallery(ArrayList<CustomGallery> customGallery){
+		ArrayList<String> selectedImagesPaths = new ArrayList<String>();
+
+		for (CustomGallery cg : customGallery) {
+			selectedImagesPaths.add(cg.getPath());
+		}
+		return selectedImagesPaths;
+	}
 
 
 
