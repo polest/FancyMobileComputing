@@ -13,8 +13,10 @@ buildscript {
 }
 
 allprojects {
+
     repositories {
         jcenter()
+        mavenCentral()
         maven {
             url "https://artifactory.9elements.com/artifactory/imgly"
         }
