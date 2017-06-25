@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -33,7 +34,7 @@ public class MusicPicker extends Activity {
     private ListView musicList;
     private MediaPlayer mPlayer = null;
     private Button btnConfirmMusic;
-    String musicPath;
+    Uri musicPath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +46,7 @@ public class MusicPicker extends Activity {
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Toast.makeText(MusicPicker.this, musicPath, Toast.LENGTH_LONG).show();
+                        Toast.makeText(MusicPicker.this, musicPath.toString(), Toast.LENGTH_LONG).show();
                         mPlayer.reset();
                         Intent intent = new Intent(MusicPicker.this, MainActivity.class);
                         intent.putExtra("selectedMusicPath", musicPath);
@@ -115,7 +116,8 @@ public class MusicPicker extends Activity {
                 int itemPosition = position;
 
                 // ListView Clicked item value
-                musicPath = "android.resource://"+getPackageName()+"/raw/" + (String) musicList.getItemAtPosition(position);
+                //uri = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.usa_for_africa_we_are_the_world);
+                musicPath = Uri.parse("android.resource://"+getPackageName()+"/raw/" + mp3s[itemPosition] + ".mp3");
 
                 mPlayer = MediaPlayer.create(MusicPicker.this, mp3s[position]);
                 mPlayer.start();
