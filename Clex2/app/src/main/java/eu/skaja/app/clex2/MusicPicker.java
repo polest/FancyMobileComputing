@@ -1,10 +1,14 @@
 
 package eu.skaja.app.clex2;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -16,6 +20,7 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -27,6 +32,7 @@ public class MusicPicker extends Activity {
     private ListView musicList;
     private MediaPlayer mPlayer = null;
     private Button btnConfirmMusic;
+    private Button btnSelectAndroidMusic;
     String musicPath;
 
     @Override
@@ -39,7 +45,7 @@ public class MusicPicker extends Activity {
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Toast.makeText(MusicPicker.this, musicPath, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MusicPicker.this, musicPath, Toast.LENGTH_LONG).show();
                         mPlayer.reset();
                         Intent intent = new Intent(MusicPicker.this, MainActivity.class);
                         intent.putExtra("selectedMusicPath", musicPath);
@@ -51,39 +57,47 @@ public class MusicPicker extends Activity {
         );
 
         musicList = (ListView)findViewById(R.id.musicList);
+        btnSelectAndroidMusic = (Button) findViewById(R.id.btnSelectAndroidMusic);
 
         String[] values = new String[] {
+                "Africa",
+                "Hip Hop Japanese",
+                "Honorable Battle",
                 "Inspirational",
-                "Hearthbeat",
+                "Japanese Jingle",
+                "Jazz Trio",
+                "Not What It Seems",
                 "Sadly",
-                "TheBuildup",
-                "Inspirational",
-                "Hearthbeat",
-                "Sadly",
-                "TheBuildup",
-                "Inspirational",
-                "Hearthbeat",
-                "Sadly",
-                "TheBuildup",
-                "Inspirational",
-                "Hearthbeat",
-                "Sadly",
-                "TheBuildup",
-                "Inspirational",
-                "Hearthbeat",
-                "Sadly",
-                "TheBuildup",
-                "Inspirational",
-                "Hearthbeat",
-                "Sadly",
-                "TheBuildup"
-
+                "Shoulder Angel (no vocals)",
+                "Shoulder Angel (vocals)",
+                "The Build Up",
+                "Traditional Japanese",
+                "Traditional Japanese 2",
+                "Ufo Slowing",
+                "Ufo Speeding",
+                "World War 3",
+                "Yegods",
+                "Zombie Farm"
         };
         final Integer[] mp3s = new Integer[] {
+                R.raw.africa,
+                R.raw.hip_hop_japanese,
+                R.raw.honorable_battle,
                 R.raw.inspirational,
-                R.raw.heartbeat_full,
+                R.raw.japanese_jingle,
+                R.raw.jazz_trio,
+                R.raw.not_what_it_seems,
                 R.raw.sadly,
-                R.raw.thebuildup
+                R.raw.shoulder_angel_no_vocals,
+                R.raw.shoulder_angel_with_vocals,
+                R.raw.the_build_up,
+                R.raw.traditional_japanese,
+                R.raw.traditional_japanese_2,
+                R.raw.ufo_slowing,
+                R.raw.ufo_speeding,
+                R.raw.world_war_3,
+                R.raw.yegods,
+                R.raw.zombie_farm
         };
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
@@ -100,16 +114,34 @@ public class MusicPicker extends Activity {
                     mPlayer.reset();
 
                 // ListView Clicked item index
-                int itemPosition     = position;
+                int itemPosition = position;
 
                 // ListView Clicked item value
-                musicPath    = (String) musicList.getItemAtPosition(position);
+                musicPath = "android.resource://"+getPackageName()+"/raw/" + (String) musicList.getItemAtPosition(position);
 
                 mPlayer = MediaPlayer.create(MusicPicker.this, mp3s[position]);
                 mPlayer.start();
             }
 
         });
+
+        btnSelectAndroidMusic.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                            if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)== PackageManager.PERMISSION_GRANTED) {
+                                Intent i = new Intent(Intent.ACTION_GET_CONTENT, MediaStore.Audio.Media.EXTERNAL_CONTENT_URI);
+                                i.setType("audio/*");
+                                i.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                                //startActivityForResult(i, PICK_IMAGE_MULTIPLE);
+                            } else {
+                                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
+                            }
+                        }
+                    }
+                }
+        );
 
 
 
