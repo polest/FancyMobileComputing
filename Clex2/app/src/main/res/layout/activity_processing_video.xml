@@ -8,18 +8,42 @@
     tools:context="eu.skaja.app.clex2.ProcessingVideo">
 
     <LinearLayout
-        android:layout_width="368dp"
-        android:layout_height="0dp"
+        android:id="@+id/linearLayout3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="0dp"
+        android:background="#1c1c1c"
+        android:gravity="center_horizontal|center"
         android:orientation="vertical"
+        android:paddingBottom="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="@+id/linearLayout"
+        app:layout_constraintRight_toRightOf="@+id/linearLayout">
+
+        <Button
+            android:id="@+id/btnProcessVideo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/create_video" />
+    </LinearLayout>
+
+    <LinearLayout
         android:id="@+id/linearLayout"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp"
+        android:orientation="vertical"
+        android:weightSum="1"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout3"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="8dp"
-        android:layout_marginLeft="8dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        android:layout_marginBottom="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/linearLayout3">
+        app:layout_constraintVertical_bias="1.0"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp">
 
         <TextView
             android:id="@+id/textView3"
@@ -31,50 +55,52 @@
             android:textSize="36dp" />
 
         <TextView
+            android:id="@+id/textView4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:text="Duration of each image"
+            android:textColor="#FFF"
+            android:textSize="24dp" />
+
+        <TextView
             android:id="@+id/textView2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:text="Lenght of images"
+            android:layout_marginTop="0dp"
+            android:text="in seconds"
             android:textColor="#FFF"
-            android:textSize="20dp" />
+            android:textSize="16dp" />
 
         <SeekBar
-            android:id="@+id/seekBar3"
+            android:id="@+id/seekBar"
             style="@style/Widget.AppCompat.SeekBar.Discrete"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:max="5"
+            android:max="4"
             android:padding="0dp"
             android:paddingBottom="0dp"
             android:paddingEnd="0dp"
             android:paddingLeft="0dp"
             android:paddingRight="0dp"
             android:paddingStart="0dp"
-            android:progress="3" />
+            android:progress="2" />
 
-    </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
 
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="67dp"
-        android:layout_marginEnd="0dp"
-        android:layout_marginLeft="0dp"
-        android:layout_marginRight="0dp"
-        android:layout_marginStart="0dp"
-        android:background="#1c1c1c"
-        android:gravity="center_horizontal|center"
-        android:orientation="vertical"
-        app:layout_constraintLeft_toLeftOf="@+id/linearLayout"
-        app:layout_constraintRight_toRightOf="@+id/linearLayout"
-        android:id="@+id/linearLayout3"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginBottom="8dp">
+            <TextView
+                android:id="@+id/txtCurrentDuration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="0dp"
+                android:text="Current duration: 3 seconds"
+                android:textColor="#FFF"
+                android:textSize="16dp" />
 
-        <Button
-            android:id="@+id/btnProcessVideo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/create_video" />
+        </LinearLayout>
+
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>
