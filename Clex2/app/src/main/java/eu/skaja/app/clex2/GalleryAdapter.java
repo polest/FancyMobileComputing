@@ -27,6 +27,7 @@ public class GalleryAdapter extends BaseAdapter {
 	private LayoutInflater infalter;
 	private ArrayList<CustomGallery> data = new ArrayList<CustomGallery>();
 	ImageLoader imageLoader;
+    private String selectedPath= null;
 
 	private boolean isActionMultiplePick;
 
@@ -64,6 +65,16 @@ public class GalleryAdapter extends BaseAdapter {
 		}
 		notifyDataSetChanged();
 	}
+
+    public void setSelectedPath(String path)
+    {
+        selectedPath=path;
+    }
+
+    public void setUnselectedPath()
+    {
+        selectedPath=null;
+    }
 
 	public boolean isAllSelected() {
 		boolean isAllSelected = true;
@@ -207,8 +218,19 @@ public class GalleryAdapter extends BaseAdapter {
 			e.printStackTrace();
 		}
 
+
+        if(data.get(position).sdcardPath==selectedPath)
+        {
+            convertView.setBackgroundColor(0xFF1cc845);
+        } else {
+            convertView.setBackgroundColor(0);
+        }
+
+
+
 		return convertView;
 	}
+
 
 	public class ViewHolder {
 		ImageView imgQueue;

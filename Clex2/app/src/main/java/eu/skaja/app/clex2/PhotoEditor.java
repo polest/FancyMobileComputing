@@ -93,6 +93,8 @@ public class PhotoEditor extends Activity implements PermissionRequest.Response 
 
         }
 
+        finish();
+
     }
 
     // Important permission request for Android 6.0 and above, don't forget this!

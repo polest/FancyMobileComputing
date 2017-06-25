@@ -36,7 +36,6 @@ import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 
 public class MainActivity extends Activity {
 
-
     private String selectedImagePath = null;
     private int selectedImagePos = -1;
 	private boolean imagesPicked = false;
@@ -54,7 +53,7 @@ public class MainActivity extends Activity {
 	private Handler handler;
 	private ImageLoader imageLoader;
 	private ImageView imgSinglePick;
-    private int EDITOR_RESULT = 0;
+    private int EDITOR_RESULT = 2;
 	private int toggle;
 	private List<String> imagesEncodedList;
 	private String action;
@@ -63,12 +62,13 @@ public class MainActivity extends Activity {
 	private String selectedImage;
 	private ViewSwitcher viewSwitcher;
 	private AdapterView<?> adapterView;
-	private CreateVideo video;
-	private ArrayList<CustomGallery> dataT = new ArrayList<CustomGallery>();
+	private ArrayList<CustomGallery> dataT = new ArrayList<>();
 	private ArrayList<String> selectedImagesPathList;
+
 
 	public static final int PICK_IMAGE_MULTIPLE = 1;
 	public static final int MUSIC_PICKER = 2;
+	public static final int VIDEO_SETTING = 3;
 
 
 	@Override
@@ -76,7 +76,6 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.main);
-
 		initImageLoader();
 		init();
 	}
@@ -107,26 +106,28 @@ public class MainActivity extends Activity {
             @Override
             public void onItemClick(AdapterView<?> l, View v, int position, long id) {
 
-                if(selectedImagePos == position && toggle == 1){
-                    // unselect image
-                    adapter.unselectAll(l);
-                    selectedImagePath = null;
-                    selectedImagePos = -1;
-                    toggle = 0;
 
-                } else {
-                    // select selected
-                    adapter.unselectAll(l);
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                        l.getChildAt(position).setBackgroundColor(0xFF1cc845);
-                    }
-                    selectedImagePath = adapter.getItem(position).sdcardPath;
-                    selectedImagePos = position;
-                    toggle = 1;
-                }
+            if(selectedImagePath == dataT.get(position).sdcardPath && toggle == 1){
 
+                // unselect image
+                selectedImagePath = null;
+                selectedImagePos = -1;
+                toggle = 0;
 
+                adapter.setUnselectedPath();
 
+            } else {
+                // select selected
+                selectedImagePath = adapter.getItem(position).sdcardPath;
+                selectedImagePos = position;
+                toggle = 1;
+
+                selectedImagePath = adapter.getItem(position).sdcardPath;
+                selectedImagePos = position;
+                adapter.setSelectedPath(dataT.get(position).sdcardPath);
+
+            }
+            adapter.notifyDataSetChanged();
             }
         };
 
@@ -142,15 +143,13 @@ public class MainActivity extends Activity {
 		viewSwitcher = (ViewSwitcher) findViewById(R.id.viewSwitcher);
 		btnDeleteAll = (Button) findViewById(R.id.btnDeleteAll);
 
+
 		gridGallery.setOnItemClickListener(mItemMulClickListener);
 		gridGallery.setAdapter(adapter);
-
 		viewSwitcher.setDisplayedChild(1);
-
 		btnStartEditor.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-
 
                 DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
                     @Override
@@ -164,21 +163,13 @@ public class MainActivity extends Activity {
                                 selectedImagePos = -1;
                                 selectedImagePath = null;
 
-                                int y = 0;
-                                for(CustomGallery cg : dataT){
-                                    gridGallery.getChildAt(y).setBackgroundColor(0);
-                                    y++;
-                                }
-
                                 break;
-
                             case DialogInterface.BUTTON_NEGATIVE:
                                 //No button clicked
                                 break;
                         }
                     }
                 };
-
 
                 if(selectedImagePath != null){
                     Intent intent = new Intent(MainActivity.this, PhotoEditor.class);
@@ -189,8 +180,6 @@ public class MainActivity extends Activity {
                     AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
                     builder.setMessage("Please select an image").setNegativeButton("Ok", dialogClickListener).show();
                 }
-
-
 
 			}
         });
@@ -210,7 +199,6 @@ public class MainActivity extends Activity {
 				new View.OnClickListener() {
 					@Override
 					public void onClick(View view) {
-
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                             if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)== PackageManager.PERMISSION_GRANTED) {
                                 Intent i = new Intent(Intent.ACTION_GET_CONTENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
@@ -225,68 +213,116 @@ public class MainActivity extends Activity {
                 }
 		);
 
-
+		// Invokes the processing video activity and deliver the image path list
 		btnCreate.setOnClickListener(
 				new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						Intent intent = new Intent(MainActivity.this, ProcessingVideo.class);
-						startActivity(intent);
+						selectedImagesPathList = extractPathFromCustomGallery(dataT);
+						if(!selectedImagesPathList.isEmpty()) {
+							Intent intent = new Intent(MainActivity.this, ProcessingVideo.class);
+							intent.putStringArrayListExtra("selectedImagesPathList", selectedImagesPathList);
+							intent.putExtra("musicPath", musicPath);
+							startActivity(intent);
+						}
+						else{
+							Toast.makeText(MainActivity.this, "No image is selected!", Toast.LENGTH_SHORT).show();
+						}
 					}
 				}
 		);
 
-
 		btnSortLeft.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
+                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        switch (which){
+                            case DialogInterface.BUTTON_POSITIVE:
+                                break;
+
+                            case DialogInterface.BUTTON_NEGATIVE:
+                                //No button clicked
+                                break;
+                        }
+                    }
+                };
 
 
-                if(selectedImagePos-1 >= 0) {
+                if(selectedImagePath != null){
 
-                    CustomGallery leftImageTemp = dataT.get(selectedImagePos - 1);
+                    if(selectedImagePos-1 >= 0) {
 
-                    dataT.set((selectedImagePos - 1), dataT.get(selectedImagePos));
-                    dataT.set(selectedImagePos, leftImageTemp);
+                        CustomGallery leftImageTemp = dataT.get(selectedImagePos - 1);
 
-                    adapter.addAll(dataT);
+                        dataT.set((selectedImagePos - 1), dataT.get(selectedImagePos));
+                        dataT.set(selectedImagePos, leftImageTemp);
 
-                    adapter.unselectAll(gridGallery);
+                        adapter.addAll(dataT);
 
-                    selectedImagePos = selectedImagePos - 1;
+                        selectedImagePos = selectedImagePos - 1;
+                        selectedImagePath = dataT.get(selectedImagePos).sdcardPath;
 
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                        gridGallery.getChildAt(selectedImagePos).setBackgroundColor(0xFF1cc845);
                     }
 
+                } else {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+                    builder.setMessage("Please select an image").setNegativeButton("Ok", dialogClickListener).show();
                 }
+
+
+
+
+
+
 			}
 		});
+
 
 
         btnSortRight.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
+                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
 
-                if(selectedImagePos+1 <= dataT.size()-1) {
+                        switch (which){
+                            case DialogInterface.BUTTON_POSITIVE:
+                                break;
 
-                    CustomGallery rightImageTemp = dataT.get(selectedImagePos + 1);
+                            case DialogInterface.BUTTON_NEGATIVE:
+                                //No button clicked
+                                break;
+                        }
+                    }
+                };
 
-                    dataT.set((selectedImagePos + 1), dataT.get(selectedImagePos));
-                    dataT.set(selectedImagePos, rightImageTemp);
+                if(selectedImagePath != null){
 
-                    adapter.addAll(dataT);
+                    if(selectedImagePos+1 <= dataT.size()-1) {
 
-                    adapter.unselectAll(gridGallery);
+                        CustomGallery rightImageTemp = dataT.get(selectedImagePos + 1);
 
-                    selectedImagePos = selectedImagePos + 1;
+                        dataT.set((selectedImagePos + 1), dataT.get(selectedImagePos));
+                        dataT.set(selectedImagePos, rightImageTemp);
 
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                        gridGallery.getChildAt(selectedImagePos).setBackgroundColor(0xFF1cc845);
+                        adapter.addAll(dataT);
+
+                        selectedImagePos = selectedImagePos + 1;
+                        selectedImagePath = dataT.get(selectedImagePos).sdcardPath;
+
                     }
 
+
+                } else {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+                    builder.setMessage("Please select an image").setNegativeButton("Ok", dialogClickListener).show();
                 }
+
             }
         });
 
@@ -300,48 +336,37 @@ public class MainActivity extends Activity {
                     public void onClick(DialogInterface dialog, int which) {
 
                         switch (which){
-                            case DialogInterface.BUTTON_POSITIVE:
-                            	viewSwitcher.setDisplayedChild(0);
-                                dataT.remove(selectedImagePos);
-                                adapter.addAll(dataT);
-                                selectedImagePos = -1;
-                                selectedImagePath = null;
+                    case DialogInterface.BUTTON_POSITIVE:
+                        viewSwitcher.setDisplayedChild(0);
+                        dataT.remove(selectedImagePos);
+                        adapter.addAll(dataT);
+                        selectedImagePos = -1;
+                        selectedImagePath = null;
 
-                                int y = 0;
-                                for(CustomGallery cg : dataT){
-                                    gridGallery.getChildAt(y).setBackgroundColor(0);
-                                    y++;
-                                }
+                        break;
 
-                                break;
-
-                            case DialogInterface.BUTTON_NEGATIVE:
-                                //No button clicked
-                                break;
-                        }
-                    }
-                };
-
-
-                if(selectedImagePos != -1){
-                    AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
-                    builder.setMessage("Do you really want to delete this image?").setPositiveButton("Yes", dialogClickListener)
-                            .setNegativeButton("No", dialogClickListener).show();
-                } else {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
-                    builder.setMessage("Please select an image").setNegativeButton("Ok", dialogClickListener).show();
+                    case DialogInterface.BUTTON_NEGATIVE:
+                        //No button clicked
+                        break;
                 }
+            }
+        };
+
+
+        if(selectedImagePos != -1){
+            AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+            builder.setMessage("Do you really want to delete this image?").setPositiveButton("Yes", dialogClickListener)
+                    .setNegativeButton("No", dialogClickListener).show();
+        } else {
+            AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+            builder.setMessage("Please select an image").setNegativeButton("Ok", dialogClickListener).show();
+        }
+
 
 
 
             }
         });
-
-
-
-
-
-
 	}
 
 	@Override
@@ -349,37 +374,26 @@ public class MainActivity extends Activity {
 		super.onActivityResult(requestCode, resultCode, data);
 		try {
 			// When an Image is picked
-			if (requestCode == PICK_IMAGE_MULTIPLE && resultCode == RESULT_OK
-                    && null != data) {
-
+			if (requestCode == PICK_IMAGE_MULTIPLE && resultCode == RESULT_OK && null != data) {
 				imagesEncodedList = new ArrayList<String>();
 				if(data.getData()!=null){
-
 					Uri mImageUri=data.getData();
-
 					imageEncoded  = getRealPathFromURI_API19(getApplicationContext(), mImageUri);
 					imagesEncodedList.add(imageEncoded);
-
 				}else {
 					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
 						if (data.getClipData() != null) {
 							ClipData mClipData = data.getClipData();
-
 							for (int i = 0; i < mClipData.getItemCount(); i++) {
-
 								ClipData.Item item = mClipData.getItemAt(i);
 								Uri uri = item.getUri();
-
 								imageEncoded  = getRealPathFromURI_API19(getApplicationContext(), uri);
 								imagesEncodedList.add(imageEncoded);
-
 							}
 						}
 					}
 				}
-
 				int x = 0;
-
 				for (String string : imagesEncodedList) {
 					CustomGallery item = new CustomGallery();
 					item.sdcardPath = string;
@@ -387,13 +401,10 @@ public class MainActivity extends Activity {
 					dataT.add(item);
                     x++;
 				}
-
 				viewSwitcher.setDisplayedChild(0);
 				adapter.addAll(dataT);
 				this.imagesPicked = true;
 
-            } else {
-                Toast.makeText(this, "No image selected", Toast.LENGTH_LONG).show();
             }
         } catch (Exception e) {
             Toast.makeText(this, "Something went wrong, please try again", Toast.LENGTH_LONG).show();
@@ -407,22 +418,15 @@ public class MainActivity extends Activity {
 			// that the music for the video is selected
 			this.musicPicked = true;
 		}
-
         if (requestCode == EDITOR_RESULT && resultCode == RESULT_OK) {
-
                 String newPath=data.getStringExtra("getNewPath");
 				int imagePos = data.getIntExtra("getImagePos", -1);
-
                 CustomGallery cgNew = new CustomGallery();
                 cgNew.sdcardPath = newPath;
                 cgNew.position = imagePos;
-
 				dataT.set(imagePos, cgNew);
                 adapter.addAll(dataT);
-
         }
-
-
     }
 
 	public static String getRealPathFromURI_API19(Context context, Uri uri) {
@@ -488,12 +492,12 @@ public class MainActivity extends Activity {
 
 	// Extract the path from custom gallery objects which is necessary for creating a video
 	public ArrayList<String> extractPathFromCustomGallery(ArrayList<CustomGallery> customGallery){
-		ArrayList<String> selectedImagesPaths = new ArrayList<String>();
+		ArrayList<String> selectedImagesPathList = new ArrayList<>();
 
 		for (CustomGallery cg : customGallery) {
-			selectedImagesPaths.add(cg.getPath());
+			selectedImagesPathList.add(cg.getPath());
 		}
-		return selectedImagesPaths;
+		return selectedImagesPathList;
 	}
 
 
