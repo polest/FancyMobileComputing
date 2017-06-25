@@ -43,6 +43,7 @@ public class MainActivity extends Activity {
 	private boolean musicPicked = false;
 	private Button btnCreate;
 	private Button btnDelete;
+	private Button btnDeleteAll;
 	private Button btnPickMusic;
 	private Button btnSelectImages;
 	private Button btnSortLeft;
@@ -139,6 +140,7 @@ public class MainActivity extends Activity {
 		btnSelectImages = (Button) findViewById(R.id.btnSelectImages);
 		imgSinglePick = (ImageView) findViewById(R.id.imgSinglePick);
 		viewSwitcher = (ViewSwitcher) findViewById(R.id.viewSwitcher);
+		btnDeleteAll = (Button) findViewById(R.id.btnDeleteAll);
 
 		gridGallery.setOnItemClickListener(mItemMulClickListener);
 		gridGallery.setAdapter(adapter);
