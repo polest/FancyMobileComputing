@@ -58,9 +58,7 @@ public class MainActivity extends Activity {
     private String action;
     private String imageEncoded;
     private String musicPath;
-    private String selectedImage;
     private ViewSwitcher viewSwitcher;
-    private AdapterView<?> adapterView;
     private ArrayList<CustomGallery> dataT = new ArrayList<>();
     private ArrayList<String> selectedImagesPathList;
 
@@ -352,6 +350,38 @@ public class MainActivity extends Activity {
                 }
             }
         });
+
+
+        btnDeleteAll.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        switch (which){
+                            case DialogInterface.BUTTON_POSITIVE:
+
+                                dataT = new ArrayList<>();
+
+                                adapter.addAll(dataT);
+                                break;
+
+                            case DialogInterface.BUTTON_NEGATIVE:
+                                //No button clicked
+                                break;
+                        }
+                    }
+                };
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+                builder.setMessage("Do you really want to delete ALL images?").setPositiveButton("Yes", dialogClickListener)
+                        .setNegativeButton("No", dialogClickListener).show();
+            }
+        });
+
+
     }
 
     @Override
