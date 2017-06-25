@@ -106,27 +106,29 @@ public class MainActivity extends Activity {
             @Override
             public void onItemClick(AdapterView<?> l, View v, int position, long id) {
 
-            if(selectedImagePath == dataT.get(position).sdcardPath && toggle == 1){
+                Toast.makeText(MainActivity.this, "-> " + dataT.get(position).position, Toast.LENGTH_SHORT).show();
 
-                // unselect image
-                selectedImagePath = null;
-                selectedImagePos = -1;
-                toggle = 0;
+                if(selectedImagePath == dataT.get(position).sdcardPath && toggle == 1){
 
-                adapter.setUnselectedPath();
+                    // unselect image
+                    selectedImagePath = null;
+                    selectedImagePos = -1;
+                    toggle = 0;
 
-            } else {
-                // select selected
-                selectedImagePath = adapter.getItem(position).sdcardPath;
-                selectedImagePos = position;
-                toggle = 1;
+                    adapter.setUnselectedPath();
 
-                selectedImagePath = adapter.getItem(position).sdcardPath;
-                selectedImagePos = position;
-                adapter.setSelectedPath(dataT.get(position).sdcardPath);
+                } else {
+                    // select selected
+                    selectedImagePath = adapter.getItem(position).sdcardPath;
+                    selectedImagePos = position;
+                    toggle = 1;
 
-            }
-            adapter.notifyDataSetChanged();
+                    selectedImagePath = adapter.getItem(position).sdcardPath;
+                    selectedImagePos = position;
+                    adapter.setSelectedPath(dataT.get(position).sdcardPath);
+
+                }
+                adapter.notifyDataSetChanged();
             }
         };
 
@@ -266,12 +268,6 @@ public class MainActivity extends Activity {
                     AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
                     builder.setMessage("Please select an image").setNegativeButton("Ok", dialogClickListener).show();
                 }
-
-
-
-
-
-
 			}
 		});
 
@@ -295,7 +291,6 @@ public class MainActivity extends Activity {
                     }
                 };
 
-
                 if(selectedImagePath != null){
 
                     if(selectedImagePos+1 <= dataT.size()-1) {
@@ -316,14 +311,6 @@ public class MainActivity extends Activity {
                     AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
                     builder.setMessage("Please select an image").setNegativeButton("Ok", dialogClickListener).show();
                 }
-
-
-
-
-
-
-
-
             }
         });
 
@@ -337,42 +324,32 @@ public class MainActivity extends Activity {
                     public void onClick(DialogInterface dialog, int which) {
 
                         switch (which){
-                    case DialogInterface.BUTTON_POSITIVE:
-                        viewSwitcher.setDisplayedChild(0);
-                        dataT.remove(selectedImagePos);
-                        adapter.addAll(dataT);
-                        selectedImagePos = -1;
-                        selectedImagePath = null;
+                            case DialogInterface.BUTTON_POSITIVE:
+                                viewSwitcher.setDisplayedChild(0);
+                                dataT.remove(selectedImagePos);
+                                adapter.addAll(dataT);
+                                selectedImagePos = -1;
+                                selectedImagePath = null;
 
-                        break;
+                                break;
 
-                    case DialogInterface.BUTTON_NEGATIVE:
-                        //No button clicked
-                        break;
+                            case DialogInterface.BUTTON_NEGATIVE:
+                                //No button clicked
+                                break;
+                        }
+                    }
+                };
+
+                if(selectedImagePos != -1){
+                    AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+                    builder.setMessage("Do you really want to delete this image?").setPositiveButton("Yes", dialogClickListener)
+                            .setNegativeButton("No", dialogClickListener).show();
+                } else {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+                    builder.setMessage("Please select an image").setNegativeButton("Ok", dialogClickListener).show();
                 }
             }
-        };
-
-
-        if(selectedImagePos != -1){
-            AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
-            builder.setMessage("Do you really want to delete this image?").setPositiveButton("Yes", dialogClickListener)
-                    .setNegativeButton("No", dialogClickListener).show();
-        } else {
-            AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
-            builder.setMessage("Please select an image").setNegativeButton("Ok", dialogClickListener).show();
-        }
-
-
-
-            }
         });
-
-
-
-
-
-
 	}
 
 	@Override
@@ -409,14 +386,28 @@ public class MainActivity extends Activity {
 					}
 				}
 
-				int x = 0;
+				int x = dataT.size();
 
 				for (String string : imagesEncodedList) {
 					CustomGallery item = new CustomGallery();
-					item.sdcardPath = string;
-                    item.position = x;
-					dataT.add(item);
-                    x++;
+
+
+                    boolean addItem = true;
+                    for(int i = 0; i < dataT.size(); i++){
+                        String path = dataT.get(i).sdcardPath;
+                        if(string.equals(path)){
+                            addItem = false;
+                        }
+                    }
+
+                    if(addItem) {
+                        item.sdcardPath = string;
+                        item.position = x;
+                        dataT.add(item);
+                        x++;
+                    }
+
+
 				}
 
 				viewSwitcher.setDisplayedChild(0);
@@ -450,10 +441,9 @@ public class MainActivity extends Activity {
                 adapter.addAll(dataT);
 
         }
-
-
     }
 
+    // get real path from URI
 	public static String getRealPathFromURI_API19(Context context, Uri uri) {
 		String filePath = "";
 		if (uri.getHost().contains("com.android.providers.media")) {
@@ -484,11 +474,11 @@ public class MainActivity extends Activity {
 		} else {
 			// image pick from gallery
 			return  getRealPathFromURI(context,uri);
-
 		}
 
 	}
 
+    // get real path from URI
     public static String getRealPathFromURI(Context context, Uri contentUri) {
         Cursor cursor = null;
         try {
