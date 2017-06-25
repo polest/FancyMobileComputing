@@ -1,6 +1,7 @@
 package eu.skaja.app.clex2;
 
 import android.app.Activity;
+import android.media.MediaMuxer;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Movie;
@@ -17,7 +18,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 //Wird als Objekt genutzt, welches in JEncode geladen wird.
-public class CreateVideo{
+public class CreateVideo implements MediaMuxer{
 
     private ArrayList<String> imagePathList;
     private int fps;
@@ -53,6 +54,7 @@ public class CreateVideo{
 }
 
     // Combine video with music track
+ /*   public void combine(String videoPath, String musicPath){
         String videofilepath = videoPath;
         String audiofilepath = musicPath;
         File file = new File(videofilepath);
@@ -71,6 +73,7 @@ public class CreateVideo{
         mp4file.writeContainer(fc);
         fc.close();
     }
+*/
     public String getVideoTitle() {
         Date date = new Date(); // your date
         Calendar cal = Calendar.getInstance();
