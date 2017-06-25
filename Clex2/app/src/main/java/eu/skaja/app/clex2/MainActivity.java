@@ -259,7 +259,6 @@ public class MainActivity extends Activity {
 
                         selectedImagePos = selectedImagePos - 1;
                         selectedImagePath = dataT.get(selectedImagePos).sdcardPath;
-                        //adapter.setUnselectedPath();
 
                     }
 
@@ -310,7 +309,6 @@ public class MainActivity extends Activity {
 
                         selectedImagePos = selectedImagePos + 1;
                         selectedImagePath = dataT.get(selectedImagePos).sdcardPath;
-                        //adapter.setUnselectedPath();
 
                     }
 
