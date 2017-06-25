@@ -224,17 +224,13 @@ public class MainActivity extends Activity {
                 }
 		);
 
+
 		btnCreate.setOnClickListener(
 				new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						try {
-							// Create video with given image paths and music path
-							Toast.makeText(getApplicationContext(),"Video ist created",Toast.LENGTH_SHORT).show();
-							video = new CreateVideo(imagesEncodedList, musicPath);
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
+						Intent intent = new Intent(MainActivity.this, ProcessingVideo.class);
+						startActivity(intent);
 					}
 				}
 		);
