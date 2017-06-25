@@ -1,6 +1,8 @@
 package eu.skaja.app.clex2;
 
 import android.app.Activity;
+import android.media.MediaCodec;
+import android.media.MediaFormat;
 import android.media.MediaMuxer;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -8,17 +10,24 @@ import android.graphics.Movie;
 import android.os.Environment;
 import android.provider.ContactsContract;
 import android.widget.Toast;
+
+import com.coremedia.iso.boxes.Container;
+import com.googlecode.mp4parser.authoring.Track;
+import com.googlecode.mp4parser.authoring.container.mp4.MovieCreator;
+
 import org.jcodec.api.android.SequenceEncoder;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
 //Wird als Objekt genutzt, welches in JEncode geladen wird.
-public class CreateVideo implements MediaMuxer{
+public class CreateVideo /*implements MediaMuxer*/{
 
     private ArrayList<String> imagePathList;
     private int fps;
@@ -41,11 +50,17 @@ public class CreateVideo implements MediaMuxer{
             //encoder.getEncoder().setKeyInterval(25);
 
             for (String path : this.imagePathList) {
-                for(int i = 0; i < fps; i++){
+                for(int i = 0; i < fps - 1; i++){
                     Bitmap image = BitmapFactory.decodeFile(path);
                     encoder.encodeImage(image);
                 }
             }
+            /*for(int j = 0; j < imagePathList.size()-1; j++){
+                for(int i = 0; i < fps; i++){
+                    Bitmap image = BitmapFactory.decodeFile(imagePathList.get(j));
+                    encoder.encodeImage(image);
+                }
+            }*/
             encoder.finish();
             //Toast.makeText(,"Video has been created!", Toast.LENGTH_LONG);
         }catch (IOException ex){
@@ -53,27 +68,35 @@ public class CreateVideo implements MediaMuxer{
         }
 }
 
-    // Combine video with music track
- /*   public void combine(String videoPath, String musicPath){
-        String videofilepath = videoPath;
-        String audiofilepath = musicPath;
-        File file = new File(videofilepath);
+        // Combine video with music track
+      /*public void combine(String videoPath, String musicPath){
+          MediaMuxer muxer = new MediaMuxer("temp.mp4", OutputFormat.MUXER_OUTPUT_MPEG_4);
+          // More often, the MediaFormat will be retrieved from MediaCodec.getOutputFormat()
+          // or MediaExtractor.getTrackFormat().
+          MediaFormat audioFormat = new MediaFormat();
+          MediaFormat videoFormat = new MediaFormat();
+          int audioTrackIndex = muxer.addTrack(audioFormat);
+          int videoTrackIndex = muxer.addTrack(videoFormat);
+          ByteBuffer inputBuffer = ByteBuffer.allocate(bufferSize);
+          boolean finished = false;
+          MediaCodec.BufferInfo bufferInfo = new MediaCodec.BufferInfo();
 
-        H264TrackImpl h264Track = new H264TrackImpl(new FileDataSourceImpl(videofilepath));
-        AACTrackImpl aacTrack = new AACTrackImpl(new FileDataSourceImpl(audiofilepath));
+          muxer.start();
+          while(!finished) {
+              // getInputBuffer() will fill the inputBuffer with one frame of encoded
+              // sample from either MediaCodec or MediaExtractor, set isAudioSample to
+              // true when the sample is audio data, set up all the fields of bufferInfo,
+              // and return true if there are no more samples.
+              finished = getInputBuffer(inputBuffer, isAudioSample, bufferInfo);
+              if (!finished) {
+                  int currentTrackIndex = isAudioSample ? audioTrackIndex : videoTrackIndex;
+                  muxer.writeSampleData(currentTrackIndex, inputBuffer, bufferInfo);
+              }
+          };
+          muxer.stop();
+          muxer.release();
+    }*/
 
-        Movie movie = new Movie();
-        movie.addTrack(h264Track);
-        movie.addTrack(aacTrack);
-
-
-        Container mp4file = new DefaultMp4Builder().build(movie);
-
-        FileChannel fc = new FileOutputStream(new File(Environment.getExternalStorageDirectory().toString() + "/video.mp4")).getChannel();
-        mp4file.writeContainer(fc);
-        fc.close();
-    }
-*/
     public String getVideoTitle() {
         Date date = new Date(); // your date
         Calendar cal = Calendar.getInstance();

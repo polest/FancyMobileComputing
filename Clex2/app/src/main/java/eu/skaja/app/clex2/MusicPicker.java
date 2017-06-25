@@ -15,10 +15,8 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import java.util.ArrayList;
 import java.util.HashMap;
-
 import static android.R.id.list;
 import static com.nostra13.universalimageloader.core.ImageLoader.TAG;
 
@@ -27,7 +25,7 @@ public class MusicPicker extends Activity {
     private ListView musicList;
     private MediaPlayer mPlayer = null;
     private Button btnConfirmMusic;
-    String musicPath;
+    private String musicPath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +43,6 @@ public class MusicPicker extends Activity {
                         intent.putExtra("selectedMusicPath", musicPath);
                         setResult(Activity.RESULT_OK, intent);
                         finish();
-
                     }
                 }
         );
