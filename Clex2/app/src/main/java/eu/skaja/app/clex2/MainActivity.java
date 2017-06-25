@@ -231,7 +231,7 @@ public class MainActivity extends Activity {
 						try {
 							// Create video with given image paths and music path
 							Toast.makeText(getApplicationContext(),"Video ist created",Toast.LENGTH_SHORT).show();
-							video = new CreateVideo(imagesEncodedList, musicPath, 50);
+							video = new CreateVideo(selectedImagesPathList, musicPath, 50);
 						} catch (IOException e) {
 							e.printStackTrace();
 						}

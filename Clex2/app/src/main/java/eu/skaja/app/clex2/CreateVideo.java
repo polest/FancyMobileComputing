@@ -3,27 +3,30 @@ package eu.skaja.app.clex2;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Movie;
 import android.os.Environment;
 import android.provider.ContactsContract;
 import android.widget.Toast;
-
 import org.jcodec.api.android.SequenceEncoder;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.channels.FileChannel;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
 //Wird als Objekt genutzt, welches in JEncode geladen wird.
 public class CreateVideo{
 
-    private List<String> imagePathList;
+    private ArrayList<String> imagePathList;
+    private int fps;
     private String musicPath;
     private String filename;
-    private int fps;
+    private String videoPath;
     private final String folder = "Clex";
 
-    public CreateVideo(List<String> imagePathList, String musicPath, int fps) throws IOException {
+    public CreateVideo(ArrayList<String> imagePathList, String musicPath, int fps) throws IOException {
         this.imagePathList = imagePathList;
         this.musicPath = musicPath;
         this.fps = fps;
@@ -49,6 +52,25 @@ public class CreateVideo{
         }
 }
 
+    // Combine video with music track
+        String videofilepath = videoPath;
+        String audiofilepath = musicPath;
+        File file = new File(videofilepath);
+
+        H264TrackImpl h264Track = new H264TrackImpl(new FileDataSourceImpl(videofilepath));
+        AACTrackImpl aacTrack = new AACTrackImpl(new FileDataSourceImpl(audiofilepath));
+
+        Movie movie = new Movie();
+        movie.addTrack(h264Track);
+        movie.addTrack(aacTrack);
+
+
+        Container mp4file = new DefaultMp4Builder().build(movie);
+
+        FileChannel fc = new FileOutputStream(new File(Environment.getExternalStorageDirectory().toString() + "/video.mp4")).getChannel();
+        mp4file.writeContainer(fc);
+        fc.close();
+    }
     public String getVideoTitle() {
         Date date = new Date(); // your date
         Calendar cal = Calendar.getInstance();
