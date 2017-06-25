@@ -38,7 +38,6 @@ dependencies {
     })
     compile files('libs/universal-image-loader-1.9.0.jar')
 
-
     /* Make sure you are import the latest SDK version */
 
     /* This is optional if you do not want use an `EventTracker` and do not extend our SDK, otherwise it is required.
@@ -47,15 +46,15 @@ dependencies {
 
     //compile 'com.android.support.constraint:constraint-layout:1.0.2'
     //compile 'com.android.support:appcompat-v7:25.0.2'
+    compile files('libs/jcodec-0.1.9.jar')
+
+    testCompile 'junit:junit:4.12'
+
     compile 'ly.img.android:photo-editor-sdk:4.0.2'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
+    compile 'org.jcodec:jcodec-android:0.1.9'
     testCompile 'junit:junit:4.12'
     apt 'ly.img.android:build-processor:4.0.2'
-    compile files('libs/jcodec-0.1.9.jar')
-    compile 'org.jcodec:jcodec-android:0.1.9'
-
-    testCompile 'junit:junit:4.12'
-
 }
 
 
