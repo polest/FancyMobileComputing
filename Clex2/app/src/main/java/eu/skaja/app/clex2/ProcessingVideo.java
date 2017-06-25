@@ -25,7 +25,7 @@ public class ProcessingVideo extends Activity {
     private String musicPath;
     private Button btnProcessVideo;
     private CreateVideo video;
-    //test
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
