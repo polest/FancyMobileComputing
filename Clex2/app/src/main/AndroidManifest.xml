@@ -38,7 +38,8 @@
         </activity>
         <activity android:name=".MusicPicker" />
         <activity android:name=".PhotoEditor" />
-        <activity android:name=".BuildVideo"></activity>
+        <activity android:name=".BuildVideo" />
+        <activity android:name=".ProcessingVideo"></activity>
     </application>
 
 </manifest>

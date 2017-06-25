@@ -3,7 +3,6 @@ package eu.skaja.app.clex2;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -55,16 +54,17 @@ public class MainActivity extends Activity {
 	private ImageView imgSinglePick;
 	private int PICK_IMAGE_MULTIPLE = 1;
     private int EDITOR_RESULT = 2;
+	private int toggle;
 	private List<String> imagesEncodedList;
 	private String action;
 	private String imageEncoded;
 	private String musicPath;
 	private String selectedImage;
-    private int toggle;
 	private ViewSwitcher viewSwitcher;
 	private AdapterView<?> adapterView;
 	private CreateVideo video;
-    ArrayList<CustomGallery> dataT = new ArrayList<CustomGallery>();
+	private ArrayList<CustomGallery> dataT = new ArrayList<CustomGallery>();
+	private ArrayList<String> selectedImagesPathList;
 
 	public static final int CAMERA_PREVIEW_RESULT = 3;
 	public static final int MUSIC_PICKER = 4;
@@ -126,7 +126,7 @@ public class MainActivity extends Activity {
                 adapter.setSelectedPath(dataT.get(position).sdcardPath);
 
             }
-            //adapter.notifyDataSetChanged();
+            adapter.notifyDataSetChanged();
             }
         };
 
@@ -213,17 +213,13 @@ public class MainActivity extends Activity {
                 }
 		);
 
+
 		btnCreate.setOnClickListener(
 				new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						try {
-							// Create video with given image paths and music path
-							Toast.makeText(getApplicationContext(),"Video ist created",Toast.LENGTH_SHORT).show();
-							video = new CreateVideo(imagesEncodedList, musicPath);
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
+						Intent intent = new Intent(MainActivity.this, ProcessingVideo.class);
+						startActivity(intent);
 					}
 				}
 		);
@@ -521,6 +517,15 @@ public class MainActivity extends Activity {
 		}
 	}
 
+	// Extract the path from custom gallery objects which is necessary for creating a video
+	public ArrayList<String> extractPathFromCustomGallery(ArrayList<CustomGallery> customGallery){
+		ArrayList<String> selectedImagesPaths = new ArrayList<String>();
+
+		for (CustomGallery cg : customGallery) {
+			selectedImagesPaths.add(cg.getPath());
+		}
+		return selectedImagesPaths;
+	}
 
 
 

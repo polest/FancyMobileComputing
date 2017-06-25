@@ -1,51 +1,79 @@
 package eu.skaja.app.clex2;
 
 import android.app.Activity;
+import android.media.MediaMuxer;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Movie;
 import android.os.Environment;
+import android.provider.ContactsContract;
 import android.widget.Toast;
-
 import org.jcodec.api.android.SequenceEncoder;
-
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.channels.FileChannel;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
 //Wird als Objekt genutzt, welches in JEncode geladen wird.
-public class CreateVideo extends Activity {
+public class CreateVideo{
 
-    private List<String> imagePathList;
+    private ArrayList<String> imagePathList;
+    private int fps;
     private String musicPath;
     private String filename;
+    private String videoPath;
     private final String folder = "Clex";
 
-    public CreateVideo(List<String> imagePathList, String musicPath) throws IOException {
+    public CreateVideo(ArrayList<String> imagePathList, String musicPath, int fps) throws IOException {
         this.imagePathList = imagePathList;
         this.musicPath = musicPath;
+        this.fps = fps;
         this.filename = getVideoTitle();
 
         try {
-            File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM), this.filename);
+            File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + File.separator + folder, this.filename);
 
             SequenceEncoder encoder = new SequenceEncoder(file);
             // GOP size will be supported in 0.2
             //encoder.getEncoder().setKeyInterval(25);
 
             for (String path : this.imagePathList) {
-                //for(int i = 1; i <= 24; i++){
+                for(int i = 0; i < fps; i++){
                     Bitmap image = BitmapFactory.decodeFile(path);
                     encoder.encodeImage(image);
-                //}
+                }
             }
             encoder.finish();
+            //Toast.makeText(,"Video has been created!", Toast.LENGTH_LONG);
         }catch (IOException ex){
             ex.printStackTrace();
         }
-    }
+}
 
+    // Combine video with music track
+ /*   public void combine(String videoPath, String musicPath){
+        String videofilepath = videoPath;
+        String audiofilepath = musicPath;
+        File file = new File(videofilepath);
+
+        H264TrackImpl h264Track = new H264TrackImpl(new FileDataSourceImpl(videofilepath));
+        AACTrackImpl aacTrack = new AACTrackImpl(new FileDataSourceImpl(audiofilepath));
+
+        Movie movie = new Movie();
+        movie.addTrack(h264Track);
+        movie.addTrack(aacTrack);
+
+
+        Container mp4file = new DefaultMp4Builder().build(movie);
+
+        FileChannel fc = new FileOutputStream(new File(Environment.getExternalStorageDirectory().toString() + "/video.mp4")).getChannel();
+        mp4file.writeContainer(fc);
+        fc.close();
+    }
+*/
     public String getVideoTitle() {
         Date date = new Date(); // your date
         Calendar cal = Calendar.getInstance();
