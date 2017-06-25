@@ -18,7 +18,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 //Wird als Objekt genutzt, welches in JEncode geladen wird.
-public class CreateVideo implements MediaMuxer{
+public class CreateVideo{
 
     private ArrayList<String> imagePathList;
     private int fps;
