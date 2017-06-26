@@ -14,6 +14,7 @@ import android.graphics.BitmapFactory;
 import android.os.Environment;
 import android.provider.ContactsContract;
 import android.util.Log;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.coremedia.iso.boxes.Container;
@@ -54,6 +55,7 @@ public class CreateVideo{
     private static final int MAX_SAMPLE_SIZE = 256 * 1024;
 
 
+
     public CreateVideo(ArrayList<String> imagePathList, String musicPath, int fps) throws IOException {
         this.imagePathList = imagePathList;
         this.musicPath = musicPath;
@@ -62,7 +64,8 @@ public class CreateVideo{
 
         try {
             //String filepath = context.getApplicationInfo().dataDir;
-            File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + File.separator + folder, this.filename);
+            File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES), this.filename);
+
             //File file = new File(filepath + File.separator + folder, this.filename);
 
             SequenceEncoder encoder = new SequenceEncoder(file);

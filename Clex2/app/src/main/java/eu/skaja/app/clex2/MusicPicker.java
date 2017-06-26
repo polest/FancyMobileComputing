@@ -34,7 +34,7 @@ public class MusicPicker extends Activity {
     private ListView musicList;
     private MediaPlayer mPlayer = null;
     private Button btnConfirmMusic;
-    Uri musicPath;
+    Uri musicPath = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,11 +46,14 @@ public class MusicPicker extends Activity {
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Toast.makeText(MusicPicker.this, musicPath.toString(), Toast.LENGTH_LONG).show();
-                        mPlayer.reset();
-                        Intent intent = new Intent(MusicPicker.this, MainActivity.class);
-                        intent.putExtra("selectedMusicPath", musicPath);
-                        setResult(Activity.RESULT_OK, intent);
+                        if(musicPath != null) {
+                            Toast.makeText(MusicPicker.this, musicPath.toString(), Toast.LENGTH_LONG).show();
+
+                            mPlayer.reset();
+                            Intent intent = new Intent(MusicPicker.this, MainActivity.class);
+                            intent.putExtra("selectedMusicPath", musicPath);
+                            setResult(Activity.RESULT_OK, intent);
+                        }
                         finish();
                     }
                 }
@@ -117,7 +120,7 @@ public class MusicPicker extends Activity {
 
                 // ListView Clicked item value
                 //uri = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.usa_for_africa_we_are_the_world);
-                musicPath = Uri.parse("android.resource://"+getPackageName()+"/raw/" + mp3s[itemPosition] + ".mp3");
+                musicPath = Uri.parse("android.resource://"+getPackageName()+"/raw/" + mp3s[itemPosition] + ".aac");
 
                 mPlayer = MediaPlayer.create(MusicPicker.this, mp3s[position]);
                 mPlayer.start();
@@ -128,4 +131,12 @@ public class MusicPicker extends Activity {
 
 
     }
+
+    @Override
+    public void onBackPressed() {
+        mPlayer.stop();
+        finish();
+    }
+
+
 }
