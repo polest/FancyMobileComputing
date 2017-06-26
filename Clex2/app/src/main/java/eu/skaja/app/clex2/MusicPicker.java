@@ -1,33 +1,18 @@
 
 package eu.skaja.app.clex2;
 
-import android.Manifest;
+
 import android.app.Activity;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.provider.MediaStore;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
-import android.widget.TextView;
 import android.widget.Toast;
-
-
-import java.net.URI;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import static android.R.id.list;
-import static com.nostra13.universalimageloader.core.ImageLoader.TAG;
 
 public class MusicPicker extends Activity {
 
@@ -46,9 +31,9 @@ public class MusicPicker extends Activity {
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        // When the confirm button is clicked set the result for the main activity
                         if(musicPath != null) {
                             Toast.makeText(MusicPicker.this, musicPath.toString(), Toast.LENGTH_LONG).show();
-
                             mPlayer.reset();
                             Intent intent = new Intent(MusicPicker.this, MainActivity.class);
                             intent.putExtra("selectedMusicPath", musicPath);
@@ -61,6 +46,7 @@ public class MusicPicker extends Activity {
 
         musicList = (ListView)findViewById(R.id.musicList);
 
+        // List of all intern music names
         String[] values = new String[] {
                 "Africa",
                 "Hip Hop Japanese",
@@ -81,6 +67,8 @@ public class MusicPicker extends Activity {
                 "Yegods",
                 "Zombie Farm"
         };
+
+        // List of all intern music files
         final Integer[] mp3s = new Integer[] {
                 R.raw.africa,
                 R.raw.hip_hop_japanese,
@@ -102,6 +90,7 @@ public class MusicPicker extends Activity {
                 R.raw.zombie_farm
         };
 
+        // Create the adapter
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
                 R.layout.list_item, R.id.nameOfTitle, values);
 
@@ -122,6 +111,7 @@ public class MusicPicker extends Activity {
                 //uri = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.usa_for_africa_we_are_the_world);
                 musicPath = Uri.parse("android.resource://"+getPackageName()+"/raw/" + mp3s[itemPosition] + ".aac");
 
+                // Starts to play the music
                 mPlayer = MediaPlayer.create(MusicPicker.this, mp3s[position]);
                 mPlayer.start();
             }
@@ -134,6 +124,7 @@ public class MusicPicker extends Activity {
 
     @Override
     public void onBackPressed() {
+        // When the back button is pressed, the music will stop
         mPlayer.stop();
         finish();
     }
