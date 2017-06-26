@@ -11,8 +11,6 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-import static eu.skaja.app.clex2.MainActivity.VIDEO_SETTING;
-
 public class VideoSettings extends Activity {
 
     private SeekBar seekBar;
@@ -29,7 +27,7 @@ public class VideoSettings extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video_settings);
 
-        //Dialog
+        // Creates waiting dialog
         waiting = new ProgressDialog(this);
         waiting.setMessage("Video will be created");
         waiting.setIndeterminate(false);
@@ -45,8 +43,6 @@ public class VideoSettings extends Activity {
                     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                         duration = (seekBar.getProgress() + 1);
                         txtCurrentDuration.setText("Current duration: " + duration + " seconds");
-
-
                     }
 
                     @Override
@@ -61,17 +57,21 @@ public class VideoSettings extends Activity {
                 }
         );
 
-
+        // sets the button
         btnProcessVideo = (Button) findViewById(R.id.btnProcessVideo);
+
+        // Creates a bundle to get some values from the main activity
         Bundle bundle;
         bundle = getIntent().getExtras();
         selectedImagesPathList = bundle.getStringArrayList("selectedImagesPathList");
         musicPath = bundle.getString("musicPath");
 
+        // OnClick function for the create video button
         btnProcessVideo.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        // Starts a waiting dialog and opens the processing class
                         waiting.show();
                         Intent intent = new Intent(VideoSettings.this, ProcessingDone.class);
                         intent.putStringArrayListExtra("selectedImagesPathList", selectedImagesPathList);
@@ -85,15 +85,14 @@ public class VideoSettings extends Activity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
+        // Here we get an result from the processing activity
         if (requestCode == PROCESS_RESULT && resultCode == RESULT_OK){
+            // Sets the result for the main activity to delete everything
             Intent returnIntent = new Intent();
             returnIntent.putExtra("deleteAll",1);
             setResult(Activity.RESULT_OK,returnIntent);
             finish();
         }
-
-
-
     }
 
 }

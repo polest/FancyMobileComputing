@@ -21,6 +21,7 @@ import ly.img.android.ui.activities.PhotoEditorBuilder;
 import ly.img.android.ui.utilities.PermissionRequest;
 import ly.img.android.sdk.models.state.manager.SettingsList;
 
+// SDK Activity
 public class PhotoEditor extends Activity implements PermissionRequest.Response {
 
     public static int CAMERA_PREVIEW_RESULT = 1;
@@ -32,11 +33,12 @@ public class PhotoEditor extends Activity implements PermissionRequest.Response 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
-        Bundle b = new Bundle();
+        Bundle b;
         b = getIntent().getExtras();
         selectedImagePath = b.getString("selectedImagePath");
         selectedImagePos = b.getInt("selectedImagePos");
 
+        // Sets the settings like the output folder for all edited images
         SettingsList settingsList = new SettingsList();
         String myPicture = selectedImagePath;
         settingsList
@@ -44,7 +46,7 @@ public class PhotoEditor extends Activity implements PermissionRequest.Response 
                 .setImageSourcePath(myPicture, true) // Load with delete protection true!
 
                 .getSettingsModel(EditorSaveSettings.class)
-                .setExportDir(Directory.DCIM, "Clex-Folder")
+                .setExportDir(Directory.DCIM, "Clex")
                 .setExportPrefix("result_")
                 .setSavePolicy(
                         EditorSaveSettings.SavePolicy.KEEP_SOURCE_AND_CREATE_ALWAYS_OUTPUT
@@ -58,6 +60,8 @@ public class PhotoEditor extends Activity implements PermissionRequest.Response 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, android.content.Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
+        // When we get a result from the SDK, we handle the data and transmit the real path to the main activity
         if (resultCode == RESULT_OK && requestCode == CAMERA_PREVIEW_RESULT) {
             String resultPath =
                     data.getStringExtra(ImgLyIntent.RESULT_IMAGE_PATH);
@@ -82,9 +86,7 @@ public class PhotoEditor extends Activity implements PermissionRequest.Response 
                 sendBroadcast(scanIntent);
             }
 
-            //Toast.makeText(this, "Image Save on: " + resultPath, Toast.LENGTH_LONG).show();
-
-
+            // Sets the result for the main activity
             Intent returnIntent = new Intent();
             returnIntent.putExtra("getNewPath",resultPath);
             returnIntent.putExtra("getImagePos", selectedImagePos);
@@ -97,21 +99,22 @@ public class PhotoEditor extends Activity implements PermissionRequest.Response 
 
     }
 
-    // Important permission request for Android 6.0 and above, don't forget this!
+    // Important permission request for Android 6.0 and above
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         PermissionRequest.onRequestPermissionsResult(requestCode, permissions, grantResults);
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
+    // In case the permission is granted
     @Override
     public void permissionGranted() {
 
     }
 
+    // IN case the permisson is denied
     @Override
     public void permissionDenied() {
-        // The Permission was rejected by the user. The Editor was not opened, as it could not save the result image.
         // TODO for you: Show a Hint to the User
     }
 

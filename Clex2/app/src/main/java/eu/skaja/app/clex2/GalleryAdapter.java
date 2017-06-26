@@ -3,40 +3,29 @@ package eu.skaja.app.clex2;
 import java.util.ArrayList;
 
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
-import android.media.Image;
-import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.Toast;
-import android.graphics.drawable.Drawable;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
-
-import static eu.skaja.app.clex2.R.color.transparent;
 
 public class GalleryAdapter extends BaseAdapter {
 
 	private Context mContext;
 	private LayoutInflater infalter;
-	private ArrayList<CustomGallery> data = new ArrayList<CustomGallery>();
+	private ArrayList<ImageObject> data = new ArrayList<ImageObject>();
 	ImageLoader imageLoader;
     private String selectedPath= null;
 
-	private boolean isActionMultiplePick;
-
+	// Constructor
 	public GalleryAdapter(Context c, ImageLoader imageLoader) {
 		infalter = (LayoutInflater) c
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		mContext = c;
 		this.imageLoader = imageLoader;
-		// clearCache();
 	}
 
 	@Override
@@ -45,7 +34,7 @@ public class GalleryAdapter extends BaseAdapter {
 	}
 
 	@Override
-	public CustomGallery getItem(int position) {
+	public ImageObject getItem(int position) {
 		return data.get(position);
 	}
 
@@ -54,79 +43,20 @@ public class GalleryAdapter extends BaseAdapter {
 		return position;
 	}
 
-	public void setMultiplePick(boolean isMultiplePick) {
-		this.isActionMultiplePick = isMultiplePick;
-	}
-
-	public void selectAll(boolean selection) {
-		for (int i = 0; i < data.size(); i++) {
-			data.get(i).isSeleted = selection;
-
-		}
-		notifyDataSetChanged();
-	}
-
+	// Saves the selected image path in the variable
     public void setSelectedPath(String path)
     {
         selectedPath=path;
     }
 
+    // Empties the selectedPath variable so no image will be selected / highlighted
     public void setUnselectedPath()
     {
         selectedPath=null;
     }
 
-	public boolean isAllSelected() {
-		boolean isAllSelected = true;
-
-		for (int i = 0; i < data.size(); i++) {
-			if (!data.get(i).isSeleted) {
-				isAllSelected = false;
-				break;
-			}
-		}
-
-		return isAllSelected;
-	}
-
-	public boolean isAnySelected() {
-		boolean isAnySelected = false;
-
-		for (int i = 0; i < data.size(); i++) {
-			if (data.get(i).isSeleted) {
-				isAnySelected = true;
-				break;
-			}
-		}
-
-		return isAnySelected;
-	}
-
-	public ArrayList<CustomGallery> getSelected() {
-		ArrayList<CustomGallery> dataT = new ArrayList<CustomGallery>();
-
-		for (int i = 0; i < data.size(); i++) {
-			if (data.get(i).isSeleted) {
-				dataT.add(data.get(i));
-			}
-		}
-
-		return dataT;
-	}
-
-
-	public void unselectAll(AdapterView<?> adapterView) {
-		ArrayList<CustomGallery> dataT = new ArrayList<CustomGallery>();
-
-		for (int i = 0; i < data.size(); i++) {
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-				adapterView.getChildAt(i).setBackground(null);
-			}
-		}
-	}
-
-	public void addAll(ArrayList<CustomGallery> files) {
-
+    // Add all objects to the gridView
+	public void addAll(ArrayList<ImageObject> files) {
 		try {
 			this.data.clear();
 			this.data.addAll(files);
@@ -134,39 +64,9 @@ public class GalleryAdapter extends BaseAdapter {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
+		// Refreshed the GridView
 		notifyDataSetChanged();
 	}
-
-	public void changeSelection(View v, int position, int oldPosition, AdapterView<?> l) {
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            if(oldPosition != -1) {
-				l.getChildAt(oldPosition).setBackground(null);
-			}
-        }
-
-        if (data.get(position).isSeleted) {
-			data.get(position).isSeleted = false;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                v.setBackground(null);
-            }
-        } else {
-			data.get(position).isSeleted = true;
-			if(oldPosition != -1) {
-				data.get(oldPosition).isSeleted = false;
-			}
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                v.setBackgroundColor(0xFFB4B4B4);
-                //l.getChildAt(position).setBackgroundColor(0xFFB4B4B4);
-            }
-		}
-
-		((ViewHolder) v.getTag()).imgQueueMultiSelected.setSelected(data
-				.get(position).isSeleted);
-
-
-    }
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
@@ -179,15 +79,6 @@ public class GalleryAdapter extends BaseAdapter {
 			holder.imgQueue = (ImageView) convertView
 					.findViewById(R.id.imgQueue);
 
-			holder.imgQueueMultiSelected = (ImageView) convertView
-					.findViewById(R.id.imgQueueMultiSelected);
-
-			if (isActionMultiplePick) {
-				holder.imgQueueMultiSelected.setVisibility(View.VISIBLE);
-			} else {
-				holder.imgQueueMultiSelected.setVisibility(View.GONE);
-			}
-
 			convertView.setTag(holder);
 
 		} else {
@@ -197,6 +88,7 @@ public class GalleryAdapter extends BaseAdapter {
 
 		try {
 
+			// Loads the images in the gridView (Recycle View)
 			imageLoader.displayImage("file://" + data.get(position).sdcardPath,
 					holder.imgQueue, new SimpleImageLoadingListener() {
 						@Override
@@ -207,18 +99,11 @@ public class GalleryAdapter extends BaseAdapter {
 						}
 					});
 
-			if (isActionMultiplePick) {
-
-				holder.imgQueueMultiSelected
-						.setSelected(data.get(position).isSeleted);
-
-			}
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
-
+		// Highlights / Selects the image with the saved path
         if(data.get(position).sdcardPath==selectedPath)
         {
             convertView.setBackgroundColor(0xFF1cc845);
@@ -226,24 +111,12 @@ public class GalleryAdapter extends BaseAdapter {
             convertView.setBackgroundColor(0);
         }
 
-
-
 		return convertView;
 	}
 
 
 	public class ViewHolder {
 		ImageView imgQueue;
-		ImageView imgQueueMultiSelected;
 	}
 
-	public void clearCache() {
-		imageLoader.clearDiscCache();
-		imageLoader.clearMemoryCache();
-	}
-
-	public void clear() {
-		data.clear();
-		notifyDataSetChanged();
-	}
 }
