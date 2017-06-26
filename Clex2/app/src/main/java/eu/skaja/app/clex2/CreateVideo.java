@@ -1,6 +1,7 @@
 package eu.skaja.app.clex2;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.Resources;
@@ -52,6 +53,7 @@ public class CreateVideo{
     private final String folder = "Clex";
     private static final int MAX_SAMPLE_SIZE = 256 * 1024;
 
+
     public CreateVideo(ArrayList<String> imagePathList, String musicPath, int fps) throws IOException {
         this.imagePathList = imagePathList;
         this.musicPath = musicPath;
@@ -59,7 +61,9 @@ public class CreateVideo{
         this.filename = getVideoTitle();
 
         try {
+            //String filepath = context.getApplicationInfo().dataDir;
             File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + File.separator + folder, this.filename);
+            //File file = new File(filepath + File.separator + folder, this.filename);
 
             SequenceEncoder encoder = new SequenceEncoder(file);
             // GOP size will be supported in 0.2
@@ -77,11 +81,12 @@ public class CreateVideo{
                     encoder.encodeImage(image);
                 }
             }*/
+
             encoder.finish();
             videoPath = file.getAbsolutePath();
 
             //MP4-PARSER
-            startMuxingParser(videoPath, musicPath);
+            //startMuxingParser(videoPath, musicPath);
 
 
             //startMuxing();
@@ -91,7 +96,7 @@ public class CreateVideo{
         }
 }
 
-    public void startMuxingParser(String videoPath, String soundPath) {
+    /*public void startMuxingParser(String videoPath, String soundPath) {
         try {
             H264TrackImpl h264Track = new H264TrackImpl(new FileDataSourceImpl(videoPath));
             AACTrackImpl aacTrack = new AACTrackImpl(new FileDataSourceImpl(soundPath));
@@ -126,8 +131,8 @@ public class CreateVideo{
         }
         MediaExtractor extractorVideo = new MediaExtractor();
         try {
-            /*AssetFileDescriptor srcVideoFd = mResources.)
-            extractorVideo.setDataSource((srcVideoFd.getFileDescriptor(), srcVideoFd.getStartOffset(), srcVideoFd.getLength());*/
+            *//*AssetFileDescriptor srcVideoFd = mResources.)
+            extractorVideo.setDataSource((srcVideoFd.getFileDescriptor(), srcVideoFd.getStartOffset(), srcVideoFd.getLength());*//*
             extractorVideo.setDataSource(videoPath);
             int tracks = extractorVideo.getTrackCount();
             for (int i = 0; i < tracks; i++) {
@@ -198,7 +203,7 @@ public class CreateVideo{
             ex.printStackTrace();
         }
 
-    }
+    }*/
 
     public String getVideoTitle() {
         Date date = new Date(); // your date
