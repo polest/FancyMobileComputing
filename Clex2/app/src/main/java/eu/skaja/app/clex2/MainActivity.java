@@ -1,6 +1,5 @@
 package eu.skaja.app.clex2;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import android.Manifest;
@@ -57,7 +56,7 @@ public class MainActivity extends Activity {
     private List<String> imagesEncodedList;
     private String action;
     private String imageEncoded;
-    private String musicPath;
+    private String musicPath = null;
     private ViewSwitcher viewSwitcher;
     private ArrayList<CustomGallery> dataT = new ArrayList<>();
     private ArrayList<String> selectedImagesPathList;
@@ -67,6 +66,7 @@ public class MainActivity extends Activity {
     public static final int MUSIC_PICKER = 2;
     public static final int VIDEO_SETTING = 3;
     private int EDITOR_RESULT = 4;
+    private int VIDEO_SETTING_RESULT = 6;
 
 
     @Override
@@ -215,10 +215,10 @@ public class MainActivity extends Activity {
                     public void onClick(View v) {
                         selectedImagesPathList = extractPathFromCustomGallery(dataT);
                         if(!selectedImagesPathList.isEmpty()) {
-                            Intent intent = new Intent(MainActivity.this, ProcessingVideo.class);
+                            Intent intent = new Intent(MainActivity.this, VideoSettings.class);
                             intent.putStringArrayListExtra("selectedImagesPathList", selectedImagesPathList);
                             intent.putExtra("musicPath", musicPath);
-                            startActivity(intent);
+                            startActivityForResult(intent, VIDEO_SETTING_RESULT);
                         }
                         else{
                             Toast.makeText(MainActivity.this, "No image is selected!", Toast.LENGTH_SHORT).show();
@@ -443,11 +443,13 @@ public class MainActivity extends Activity {
 
         // Get the selected music for the video
         if(requestCode == MUSIC_PICKER && resultCode == RESULT_OK){
-            // Get the music path from the intent
-            this.musicPath = data.getStringExtra("selectedMusicPath");
-            // Set boolean for picked music on true to give the hint
-            // that the music for the video is selected
-            this.musicPicked = true;
+            if (data.getStringExtra("selectedMusicPath") != null) {
+                // Get the music path from the intent
+                this.musicPath = data.getStringExtra("selectedMusicPath");
+                // Set boolean for picked music on true to give the hint
+                // that the music for the video is selected
+                this.musicPicked = true;
+            }
         }
         if (requestCode == EDITOR_RESULT && resultCode == RESULT_OK) {
             String newPath=data.getStringExtra("getNewPath");
@@ -458,6 +460,21 @@ public class MainActivity extends Activity {
             dataT.set(imagePos, cgNew);
             adapter.addAll(dataT);
         }
+
+
+        if (requestCode == VIDEO_SETTING_RESULT && resultCode == RESULT_OK) {
+            int deleteAll = data.getIntExtra("deleteAll", -1);
+
+            if (deleteAll == 1) {
+
+                this.musicPath = null;
+                dataT = new ArrayList<>();
+                adapter.addAll(dataT);
+
+            }
+
+        }
+
     }
 
     // get real path from URI
