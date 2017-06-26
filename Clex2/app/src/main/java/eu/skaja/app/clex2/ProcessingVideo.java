@@ -1,11 +1,13 @@
 package eu.skaja.app.clex2;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -20,17 +22,24 @@ public class ProcessingVideo extends Activity {
 
     private SeekBar seekBar;
     private TextView txtCurrentDuration;
-    private int duration = 0;
+    private int duration = 3;
     private ArrayList<String> selectedImagesPathList;
     private String musicPath;
     private Button btnProcessVideo;
     private CreateVideo video;
+    private static ProgressDialog waiting;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_processing_video);
+
+        //Dialog
+        waiting = new ProgressDialog(this);
+        waiting.setMessage("Video will be created");
+        waiting.setIndeterminate(false);
+        waiting.setCancelable(false);
 
         txtCurrentDuration = (TextView) findViewById(R.id.txtCurrentDuration);
 
@@ -72,7 +81,10 @@ public class ProcessingVideo extends Activity {
                     public void onClick(View v) {
                         try {
                             // Create video with given image paths and music path
-                            video = new CreateVideo(selectedImagesPathList, musicPath, 50);
+                            //waiting.show();
+                            video = new CreateVideo(selectedImagesPathList, musicPath, 25*duration);
+
+
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -88,4 +100,5 @@ public class ProcessingVideo extends Activity {
             this.musicPath = data.getStringExtra("musicPath");
         }
     }
+
 }
