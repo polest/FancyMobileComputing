@@ -3,19 +3,29 @@ package eu.skaja.app.clex2;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.MediaCodec;
+import android.media.MediaExtractor;
+import android.media.MediaFormat;
+import android.media.MediaMuxer;
 import android.os.Environment;
+
+import com.coremedia.iso.boxes.Container;
+import com.googlecode.mp4parser.FileDataSourceImpl;
+import com.googlecode.mp4parser.authoring.Movie;
+import com.googlecode.mp4parser.authoring.builder.DefaultMp4Builder;
+import com.googlecode.mp4parser.authoring.tracks.AACTrackImpl;
+import com.googlecode.mp4parser.authoring.tracks.h264.H264TrackImpl;
 
 import org.jcodec.api.android.SequenceEncoder;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-
-import static android.content.ContentValues.TAG;
-
-//Wird als Objekt genutzt, welches in JEncode geladen wird.
 
 public class CreateVideo{
 
@@ -24,10 +34,6 @@ public class CreateVideo{
     private String musicPath;
     private String filename;
     private String videoPath;
-    private final String folder = "Clex";
-    private static final int MAX_SAMPLE_SIZE = 256 * 1024;
-
-
 
     public CreateVideo(ArrayList<String> imagePathList, String musicPath, int fps) throws IOException {
         this.imagePathList = imagePathList;
@@ -36,43 +42,34 @@ public class CreateVideo{
         this.filename = getVideoTitle();
 
         try {
-            //String filepath = context.getApplicationInfo().dataDir;
+            // Sets the output directory for the video
             File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES), this.filename);
 
-            //File file = new File(filepath + File.separator + folder, this.filename);
-
+            // Sets the Sequence Encoder
             SequenceEncoder encoder = new SequenceEncoder(file);
-            // GOP size will be supported in 0.2
-            //encoder.getEncoder().setKeyInterval(25);
 
+            // Gets all images from the GridView
             for (String path : this.imagePathList) {
                 for(int i = 0; i < fps - 1; i++){
                     Bitmap image = BitmapFactory.decodeFile(path);
                     encoder.encodeImage(image);
                 }
             }
-            /*for(int j = 0; j < imagePathList.size()-1; j++){
-                for(int i = 0; i < fps; i++){
-                    Bitmap image = BitmapFactory.decodeFile(imagePathList.get(j));
-                    encoder.encodeImage(image);
-                }
-            }*/
 
+            // Closes the encoder
             encoder.finish();
+
+            // Saves the absolute video path
             videoPath = file.getAbsolutePath();
 
-            //MP4-PARSER
-            //startMuxingParser(videoPath, musicPath);
-
-
-            //startMuxing();
-            //Toast.makeText(,"Video has been created!", Toast.LENGTH_LONG);
         }catch (IOException ex){
             ex.printStackTrace();
         }
-}
+    }
 
-    /*public void startMuxingParser(String videoPath, String soundPath) {
+    // Our tries to muxing the audio into the video
+    /*
+    public void startMuxingParser(String videoPath, String soundPath) {
         try {
             H264TrackImpl h264Track = new H264TrackImpl(new FileDataSourceImpl(videoPath));
             AACTrackImpl aacTrack = new AACTrackImpl(new FileDataSourceImpl(soundPath));
@@ -179,10 +176,14 @@ public class CreateVideo{
             ex.printStackTrace();
         }
 
-    }*/
+    }
+    */
 
+
+
+    // returns the defined video details
     public String getVideoTitle() {
-        Date date = new Date(); // your date
+        Date date = new Date();
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
         Integer year = cal.get(Calendar.YEAR);

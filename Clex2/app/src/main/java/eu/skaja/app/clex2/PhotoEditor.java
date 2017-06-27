@@ -33,6 +33,7 @@ public class PhotoEditor extends Activity implements PermissionRequest.Response 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
+        // Gets the image position and path from the main activity that was selected
         Bundle b;
         b = getIntent().getExtras();
         selectedImagePath = b.getString("selectedImagePath");
@@ -40,6 +41,7 @@ public class PhotoEditor extends Activity implements PermissionRequest.Response 
 
         // Sets the settings like the output folder for all edited images
         SettingsList settingsList = new SettingsList();
+        // Loads the selected image in the SDK
         String myPicture = selectedImagePath;
         settingsList
                 .getSettingsModel(EditorLoadSettings.class)
